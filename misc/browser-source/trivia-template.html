@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<div id="raw-question" style="display: none;">
+<!-- Firebot replaces by line number. This comment MUST be the only thing on line 3.-->
+</div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Page</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 48px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+            margin: 0;
+            padding: 20px;
+        }
+        .question-box {
+            width: 1830px;
+            height: 500px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            padding: 20px;
+            padding-top: 10px;
+            box-sizing: border-box;
+        }
+        .instructions-timer-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .instructions-box {
+            width: 1000px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            color: #c0c0c0;
+        }
+        .timer-box {
+            width: 800px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 240px;
+            margin-left: auto;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .correctAnswer {
+            background-color: yellow;
+            color: black;
+            font-weight: bold;
+        }
+        #question {
+            font-size: 56px;
+        }
+        .choice {
+            margin-top: 5px;
+        }
+    </style>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+</head>
+<body>
+    <div class="question-box">
+        <div id="question"></div>
+        <div id="answer-A" class="choice"></div>
+        <div id="answer-B" class="choice"></div>
+        <div id="answer-C" class="choice"></div>
+        <div id="answer-D" class="choice"></div>
+    </div>
+    <div class="instructions-timer-container">
+        <div class="instructions-box">
+            <p>
+                Type your answer (A, B, C, or D) in chat.<br>
+                Faster answers earn more points!<br>
+                No penalty for incorrect answers, so take your best guess!
+            </p>
+        </div>
+        <div class="timer-box" id="countdown">
+            00:30
+        </div>
+    </div>
+    <script>
+        // Time formatting
+        function formatTime(timer) {
+            var minutes = parseInt(timer / 60, 10);
+            var seconds = parseInt(timer % 60, 10);
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            return minutes + ':' + seconds;
+        }
+        // Countdown timer script
+        function startTimer(duration, display, colorTimer, revealCorrectAnswer) {
+            var timer = duration;
+            var timerInterval = setInterval(function () {
+                display.textContent = formatTime(timer);
+                if (colorTimer) {
+                    if (timer > 15) {
+                        display.style.color = 'white';
+                    } else if (timer > 10) {
+                        display.style.color = 'yellow';
+                    } else {
+                        display.style.color = 'red';
+                    }
+                } else {
+                    display.style.color = 'white';
+                }
+                if (--timer < 0) {
+                    timer = 0;
+                    if (revealCorrectAnswer) {
+                        highlightCorrectAnswer();
+                    }
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+        // Populate question and answers from JSON
+        function populateQuestion() {
+            var rawQuestion = document.getElementById('raw-question').textContent;
+            clearHighlights();
+            var data = JSON.parse(rawQuestion);
+            var question = data.question.questionText;
+            var answers = data.answers;
+            var correctAnswers = data.correctAnswers;
+            document.getElementById('question').textContent = question;
+
+            if (answers.length > 0) {
+                document.getElementById('answer-A').textContent = 'A. ' + answers[0];
+            } else {
+                document.getElementById('answer-A').textContent = '';
+            }
+
+            if (answers.length > 1) {
+                document.getElementById('answer-B').textContent = 'B. ' + answers[1];
+            } else {
+                document.getElementById('answer-B').textContent = '';
+            }
+
+            if (answers.length > 2) {
+                document.getElementById('answer-C').textContent = 'C. ' + answers[2];
+            } else {
+                document.getElementById('answer-C').textContent = '';
+            }
+
+            if (answers.length > 3) {
+                document.getElementById('answer-D').textContent = 'D. ' + answers[3];
+            } else {
+                document.getElementById('answer-D').textContent = '';
+            }
+        }
+        // Populate placeholder
+        function populatePlaceholders() {
+            clearHighlights();
+            document.getElementById('question').textContent = 'The question will appear here in a few moments.';
+            document.getElementById('answer-A').textContent = '';
+            document.getElementById('answer-B').textContent = '';
+            document.getElementById('answer-C').textContent = '';
+            document.getElementById('answer-D').textContent = '';
+        }
+        // Highlight the correct answer
+        function highlightCorrectAnswer() {
+            clearHighlights();
+            var rawQuestion = document.getElementById('raw-question').textContent;
+            var data = JSON.parse(rawQuestion);
+            var correctAnswers = data.correctAnswers;
+            var correctAnswerIndex = correctAnswers[0];
+            const answerLetters = ['A', 'B', 'C', 'D'];
+            var correctAnswerElement = document.getElementById('answer-' + answerLetters[correctAnswerIndex]);
+            correctAnswerElement.classList.add('correctAnswer');
+        }
+        // Clear any previous highlights
+        function clearHighlights() {
+            for (var i = 0; i < 4; i++) {
+                var answerElement = document.getElementById('answer-' + String.fromCharCode(65 + i));
+                answerElement.classList.remove('correctAnswer');
+            }
+        }
+        window.onload = function () {
+            var urlParams = new URLSearchParams(window.location.search);
+            var timerDuration = urlParams.has('timerDuration') ? parseInt(urlParams.get('timerDuration')) : 30;
+            var showQuestion = urlParams.has('showQuestion') ? urlParams.get('showQuestion') : 'true';
+            var colorTimer = urlParams.has('colorTimer') ? urlParams.get('colorTimer') : 'true';
+            var revealCorrectAnswer = urlParams.has('revealCorrectAnswer') ? urlParams.get('revealCorrectAnswer') : 'true';
+            display = document.querySelector('#countdown');
+            display.innerHTML = formatTime(timerDuration);
+            startTimer(timerDuration, display, colorTimer === 'true', revealCorrectAnswer === 'true');
+            if (showQuestion === 'true') {
+                populateQuestion();
+            } else {
+                populatePlaceholders();
+            }
+        };
+    </script>
+</body>
+</html>

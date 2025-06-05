@@ -1,0 +1,113 @@
+import { answerLabels } from '../constants';
+import { TriviaGame } from '../globals';
+import { ErrorType, reportError } from '../util/errors';
+
+export type Question = {
+    questionText: string;
+    correctAnswers: string[];
+    incorrectAnswers: string[];
+};
+
+export type askedQuestion = {
+    question: Question;
+    answers: string[];
+    correctAnswers: number[];
+}
+
+export function getQuestionManager(triviaGame: TriviaGame): QuestionManager {
+    const triviaSettings = triviaGame.getFirebotManager().getGameSettings();
+    if (triviaSettings.triviaDataSettings.triviaSource === 'File') {
+        return new (require('./local').LocalQuestionManager)(triviaGame);
+    } else if (triviaSettings.triviaDataSettings.triviaSource === 'API') {
+        return new (require('./remote').RemoteQuestionManager)(triviaGame);
+    } else {
+        reportError(ErrorType.CRITICAL_ERROR, 'Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.', undefined);
+        return new QuestionManager(triviaGame);
+    }
+}
+
+export class QuestionManager {
+    protected triviaGame: TriviaGame;
+
+    constructor(triviaGame: TriviaGame) {
+        this.triviaGame = triviaGame;
+    }
+
+    /**
+     * Initialize function entrypoint to be overridden by subclasses.
+     */
+    async initializeQuestions(): Promise<boolean> {
+        // This method should be overridden by subclasses to load questions.
+        reportError(ErrorType.CRITICAL_ERROR, 'Trivia questions cannot be initialized because you have not selected a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.', undefined);
+        return false;
+    }
+
+    /**
+     * Get question entrypoint to be overridden by subclasses.
+     */
+    async getNewQuestion(): Promise<Question | undefined> {
+        // This method should be overridden by subclasses to return a new question.
+        reportError(ErrorType.CRITICAL_ERROR, 'A trivia question cannot be asked because you have not selected a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.', undefined);
+        return undefined;
+    }
+
+    /**
+     * Prepare a question for display by organizing the answers
+     */
+    prepareQuestion(question: Question): askedQuestion {
+        const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
+
+        let answers = question.correctAnswers.concat(question.incorrectAnswers);
+        if (triviaSettings.gameplaySettings.answerSortOrder === 'Alphabetical') {
+            answers = answers.sort((a, b) => {
+                // Numeric sort if possible.
+                const aNum = parseFloat(String(a).replace(/,/g, ''));
+                const bNum = parseFloat(String(b).replace(/,/g, ''));
+
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return aNum - bNum;
+                }
+
+                // Random sort otherwise.
+                return a.localeCompare(b);
+            });
+        } else {
+            // Shuffle the answers array randomly.
+            answers = answers.sort((_a, _b) => {
+                // Random sort
+                return Math.random() - 0.5;
+            });
+        }
+
+        // Common sorting regardless of selected sort order.
+        answers = answers.sort((a, b) => {
+            // Move "None of these" or equivalent to the end.
+            if (String(a).toLowerCase().startsWith('none of ')) {
+                return 1;
+            }
+            if (String(b).toLowerCase().startsWith('none of ')) {
+                return -1;
+            }
+
+            // For true/false answers, ensure that "True" comes before "False".
+            if (String(a).toLowerCase() === 'true' && String(b).toLowerCase() === 'false') {
+                return -1;
+            }
+            if (String(a).toLowerCase() === 'false' && String(b).toLowerCase() === 'true') {
+                return 1;
+            }
+        });
+
+        // Create a map of answers to their correctness status.
+        const answerMap = new Map<string, boolean>();
+        answers.forEach((answer, index) => {
+            answerMap.set(answerLabels[index].toUpperCase(), question.correctAnswers.includes(answer));
+        });
+
+        return {
+            question: question,
+            answers: answers,
+            correctAnswers: question.correctAnswers.map(answer => answers.indexOf(answer)),
+        };
+    }
+}

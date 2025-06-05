@@ -1,0 +1,156 @@
+import { EventSource } from '@crowbartools/firebot-custom-scripts-types/types/modules/event-manager';
+import { TriviaGame } from './globals';
+
+export const TRIVIA_EVENT_SOURCE_ID = "magetrivia";
+export const TRIVIA_EVENT_SOURCE_NAME = "Mage Trivia Events";
+
+export enum TriviaEvent {
+    ANSWER_ACCEPTED = "triviaAnswerAccepted",
+    ANSWER_IGNORED = "triviaAnswerIgnored",
+    ANSWER_INVALID = "triviaAnswerInvalid",
+    ANSWER_REJECTED = "triviaAnswerRejected",
+    ERROR_CRITICAL = "triviaErrorCritical",
+    ERROR_RUNTIME = "triviaErrorRuntime",
+    GAME_CANCELLED = "triviaGameCancelled",
+    GAME_ENDED = "triviaGameEnded",
+    GAME_STARTED = "triviaGameStarted",
+}
+
+/**
+ * Enum for answer rejection reasons
+ * Used in TRIVIA_ANSWER_REJECTED_EVENT metadata
+ */
+export enum AnswerRejectionReason {
+    ALREADY_ANSWERED = 'alreadyAnswered',
+    INSUFFICIENT_BALANCE = 'insufficientBalance',
+    INTERNAL_ERROR = 'internalError',
+    NOT_FOLLOWING = 'notFollowing',
+}
+
+/**
+ * Metadata for an answer that was accepted (TRIVIA_ANSWER_ACCEPTED_EVENT)
+ */
+export type AnswerAcceptedMetadata = {
+    usernames: string[];
+}
+
+/**
+ * Metadata for an answer that was ignored (TRIVIA_ANSWER_IGNORED_EVENT)
+ */
+export type AnswerIgnoredMetadata = {
+    username: string;
+    answer: string;
+    reason: string;
+}
+
+/**
+ * Metadata for an answer that was invalid (TRIVIA_ANSWER_INVALID_EVENT)
+ */
+export type AnswerInvalidMetadata = {
+    username: string;
+    answer: string;
+    reason: string;
+}
+
+/**
+ * Metadata for an answer that was rejected (TRIVIA_ANSWER_REJECTED_EVENT)
+ */
+export type AnswerRejectedMetadata = {
+    username: string;
+    answer: string;
+    balance: number | undefined;
+    wager: number | undefined;
+    reasonCode: AnswerRejectionReason;
+    reasonMessage: string;
+}
+
+const eventSource: EventSource = {
+    id: TRIVIA_EVENT_SOURCE_ID,
+    name: TRIVIA_EVENT_SOURCE_NAME,
+    events: [
+        {
+            id: TriviaEvent.GAME_STARTED,
+            name: "Question Started",
+            description: "Fires when a question is first asked.",
+        },
+        {
+            id: TriviaEvent.GAME_ENDED,
+            name: "Question Ended",
+            description: "Fires when a question's answer timer ends. (Does not fire if the question is cancelled.)",
+        },
+        {
+            id: TriviaEvent.GAME_CANCELLED,
+            name: "Question Cancelled",
+            description: "Fires when a question is cancelled.",
+        },
+        {
+            id: TriviaEvent.ANSWER_ACCEPTED,
+            name: "Answer Accepted Timer Fired",
+            description: "Fires on a periodic basis while a question is active to acknowledge accepted answers.",
+        },
+        {
+            id: TriviaEvent.ANSWER_IGNORED,
+            name: "Answer Ignored",
+            description: "Fires when a user's trivia answer is ignored.",
+            manualMetadata: {
+                username: "firebot",
+                answer: "A",
+                reason: "Example answer ignored message."
+            },
+        },
+        {
+            id: TriviaEvent.ANSWER_INVALID,
+            name: "Answer Invalid",
+            description: "Fires when a user's trivia answer is invalid.",
+            manualMetadata: {
+                username: "firebot",
+                answer: "Z",
+                reason: "Example answer invalid message."
+            },
+        },
+        {
+            id: TriviaEvent.ANSWER_REJECTED,
+            name: "Answer Rejected",
+            description: "Fires when a user's trivia answer is rejected.",
+            manualMetadata: {
+                username: "firebot",
+                answer: "A",
+                balance: 100,
+                wager: 50,
+                reasonCode: AnswerRejectionReason.INTERNAL_ERROR,
+                reasonMessage: "Example rejection reason message",
+            },
+        },
+        {
+            id: TriviaEvent.ERROR_CRITICAL,
+            name: "Critical Error",
+            description: "Fires when a critical error occurs in the trivia game.",
+            manualMetadata: {
+                message: "Example critical error message",
+            },
+        },
+        {
+            id: TriviaEvent.ERROR_RUNTIME,
+            name: "Runtime Error",
+            description: "Fires when a normal priority runtime error occurs in the trivia game.",
+            manualMetadata: {
+                message: "Example runtime error message",
+            },
+        }
+    ],
+};
+
+/**
+ * Events that are emitted by the trivia game
+ */
+export class TriviaGameEvents {
+    private triviaGame: TriviaGame;
+
+    constructor(triviaGame: TriviaGame) {
+        this.triviaGame = triviaGame;
+    }
+
+    public registerEvents() {
+        this.triviaGame.getFirebotManager().registerEventSource(eventSource);
+    }
+}
