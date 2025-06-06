@@ -26,7 +26,7 @@ type AnswerEntry = {
     award: number;
     correct: boolean;
     userDisplayName?: string; // Optional display name for the user
-    wager: number;
+    wager: number; // The amount subtracted for an incorrect answer
 }
 
 /**
@@ -39,7 +39,7 @@ export type GameState = {
     losers: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of users who answered incorrectly
     winners: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of winners with their points
     questionStart: number; // Timestamp when the question started
-    totalWagered: number; // Total amount wagered by all users
+    totalLost: number; // Total amount lost by all users for incorrect answers
     totalAwarded: number; // Total amount awarded to winners
     totalPlayers: number; // Total number of players who answered
     totalCorrect: number; // Total number of correct answers
@@ -196,8 +196,8 @@ export class GameManager {
                 this.gameState.totalCorrect++;
             } else {
                 this.gameState.totalIncorrect++;
+                this.gameState.totalLost += cacheEntry?.wager || 0;
             }
-            this.gameState.totalWagered += cacheEntry?.wager || 0;
             this.gameState.totalPlayers++;
         });
 
@@ -339,7 +339,9 @@ export class GameManager {
             // to deduct the wager again, so there's no currency adjustment.
             logger('debug', `handleAnswer: User ${username} changed their answer to ${answer}. Previous answer was ${answerLabels[entry.answerIndex]}. Original wager was ${wager}.`);
         } else {
-            // Check if the user has enough currency to wager. Adjust wager downward if necessary.
+            // Check if the user has enough currency to cover an incorrect
+            // answer. Adjust their wager downward if insufficient balances are
+            // permitted.
             if (userBalance < triviaSettings.currencySettings.wager) {
                 if (!triviaSettings.currencySettings.allowInsufficientBalance) {
                     logger('debug', `handleAnswer: User ${username} does not have enough currency to wager ${wager}.`);
@@ -349,7 +351,7 @@ export class GameManager {
                         balance: userBalance,
                         wager: wager,
                         reasonCode: AnswerRejectionReason.INSUFFICIENT_BALANCE,
-                        reasonMessage: `You do not have enough currency to wager ${wager}`
+                        reasonMessage: `You do not have enough currency to play. You need at least ${wager}.`
                     };
                     this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_REJECTED, rejection, false);
                     return false;
@@ -475,7 +477,7 @@ export class GameManager {
             losers: [],
             winners: [],
             questionStart: 0,
-            totalWagered: 0,
+            totalLost: 0,
             totalAwarded: 0,
             totalPlayers: 0,
             totalCorrect: 0,
