@@ -1,21 +1,13 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
+import { AnswerAcceptedMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent, } from './events';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
 import { ErrorType, reportError } from './util/errors';
+import { stripTrailingInvisibleCharacters } from './util/text';
 import { TwitchUtil } from './util/twitch';
-
-import {
-    AnswerAcceptedMetadata,
-    AnswerIgnoredMetadata,
-    AnswerInvalidMetadata,
-    AnswerRejectedMetadata,
-    AnswerRejectionReason,
-    TRIVIA_EVENT_SOURCE_ID,
-    TriviaEvent,
-} from './events';
 
 /**
  * Entry for a user's answer to a question
@@ -26,7 +18,7 @@ type AnswerEntry = {
     award: number;
     correct: boolean;
     userDisplayName?: string; // Optional display name for the user
-    wager: number;
+    wager: number; // The amount subtracted for an incorrect answer
 }
 
 /**
@@ -39,7 +31,7 @@ export type GameState = {
     losers: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of users who answered incorrectly
     winners: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of winners with their points
     questionStart: number; // Timestamp when the question started
-    totalWagered: number; // Total amount wagered by all users
+    totalLost: number; // Total amount lost by all users for incorrect answers
     totalAwarded: number; // Total amount awarded to winners
     totalPlayers: number; // Total number of players who answered
     totalCorrect: number; // Total number of correct answers
@@ -196,8 +188,8 @@ export class GameManager {
                 this.gameState.totalCorrect++;
             } else {
                 this.gameState.totalIncorrect++;
+                this.gameState.totalLost += cacheEntry?.wager || 0;
             }
-            this.gameState.totalWagered += cacheEntry?.wager || 0;
             this.gameState.totalPlayers++;
         });
 
@@ -239,39 +231,33 @@ export class GameManager {
     /**
      * Handle a user's answer to a question
      */
-    async handleAnswer(username: string, userDisplayName: string, answer: string): Promise<boolean> {
-        const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
-        const userBalance = await this.triviaGame.getFirebotManager().getUserCurrencyTotal(username);
-        let wager = triviaSettings.currencySettings.wager;
-
-        // Check if a game is active.
-        if (!this.isGameActive()) {
-            logger('warn', `handleAnswer: function was called while trivia is not active.`);
-            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_REJECTED, {
-                username: username,
-                answer: answer,
-                balance: userBalance,
-                wager: wager,
-                reasonCode: AnswerRejectionReason.INTERNAL_ERROR,
-                reasonMessage: "No game is active"
-            }, false);
+    async handleAnswer(username: string, userDisplayName: string, messageText: string): Promise<boolean> {
+        // Chatterino (and maybe others) will add a space and an invisible
+        // Unicode character to get around Twitch spam detection. Remove any
+        // such characters.
+        const answer = stripTrailingInvisibleCharacters(messageText).trim();
+        if (!answer.match(/^[A-Za-z]$/)) {
+            logger('debug', `Ignored invalid trivia answer format: "${answer}"`);
             return false;
         }
 
-        // Note: Answer has been validated to be a single character when passed
-        // in from the effect trigger.
+        // Check if a game is active and ignore any answers outside of the game.
+        if (!this.isGameActive()) {
+            logger('debug', `handleAnswer: function was called while trivia is not active.`);
+            return false;
+        }
+
+        // Make sure the user's answer is one of the valid choices.
         const numberOfAnswers = this.gameState.askedQuestion.answers.length;
         const answerIndex = answerLabels.indexOf(answer.toUpperCase());
         if (answerIndex < 0 || answerIndex >= numberOfAnswers) {
             logger('debug', `handleAnswer: User ${username} answered with an invalid answer: '${answer}'`);
-            const invalidAnswer: AnswerInvalidMetadata = {
-                username: username,
-                answer: answer,
-                reason: `Answer must be one of ${answerLabels.slice(0, numberOfAnswers).join(', ')}.`
-            };
-            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_INVALID, invalidAnswer, false);
             return false;
         }
+
+        const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
+        const userBalance = await this.triviaGame.getFirebotManager().getUserCurrencyTotal(username);
+        let wager = triviaSettings.currencySettings.wager;
 
         // Follower requirement.
         if (triviaSettings.gameplaySettings.requireFollowing) {
@@ -326,12 +312,6 @@ export class GameManager {
 
             if (entry.answerIndex == answerIndex) {
                 logger('debug', `handleAnswer: User ${username} has already answered the question with the same answer.`);
-                const ignoredAnswer: AnswerIgnoredMetadata = {
-                    username: username,
-                    answer: answer,
-                    reason: "You have already answered this question with the same answer."
-                };
-                this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_IGNORED, ignoredAnswer, false);
                 return false;
             }
 
@@ -339,7 +319,9 @@ export class GameManager {
             // to deduct the wager again, so there's no currency adjustment.
             logger('debug', `handleAnswer: User ${username} changed their answer to ${answer}. Previous answer was ${answerLabels[entry.answerIndex]}. Original wager was ${wager}.`);
         } else {
-            // Check if the user has enough currency to wager. Adjust wager downward if necessary.
+            // Check if the user has enough currency to cover an incorrect
+            // answer. Adjust their wager downward if insufficient balances are
+            // permitted.
             if (userBalance < triviaSettings.currencySettings.wager) {
                 if (!triviaSettings.currencySettings.allowInsufficientBalance) {
                     logger('debug', `handleAnswer: User ${username} does not have enough currency to wager ${wager}.`);
@@ -349,7 +331,7 @@ export class GameManager {
                         balance: userBalance,
                         wager: wager,
                         reasonCode: AnswerRejectionReason.INSUFFICIENT_BALANCE,
-                        reasonMessage: `You do not have enough currency to wager ${wager}`
+                        reasonMessage: `You do not have enough currency to play. You need at least ${wager}.`
                     };
                     this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_REJECTED, rejection, false);
                     return false;
@@ -475,7 +457,7 @@ export class GameManager {
             losers: [],
             winners: [],
             questionStart: 0,
-            totalWagered: 0,
+            totalLost: 0,
             totalAwarded: 0,
             totalPlayers: 0,
             totalCorrect: 0,

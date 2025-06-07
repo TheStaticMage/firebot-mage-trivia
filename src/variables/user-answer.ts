@@ -6,7 +6,7 @@ import { logger } from '../firebot';
 export const mageTriviaAnswerAccepted: ReplaceVariable = {
     definition: {
         handle: "mageTriviaAnswerAccepted",
-        description: "Returns an array of username who have answered when the 'Answer Accepted' event fires.",
+        description: "Returns an array of users who have answered when the 'Answer Accepted' event fires.",
         possibleDataOutput: ["array"],
         triggers: {
             "manual": true,
@@ -28,7 +28,7 @@ export const mageTriviaAnswerRejected: ReplaceVariable = {
     definition: {
         handle: "mageTriviaAnswerRejected",
         description: "Returns the reason that an answer was rejected for the 'Answer Rejected' event.",
-        possibleDataOutput: ["object"],
+        possibleDataOutput: ["text"],
         triggers: {
             "manual": true,
             "event": [TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ANSWER_REJECTED],
