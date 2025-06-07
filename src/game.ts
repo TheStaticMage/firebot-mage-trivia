@@ -247,26 +247,10 @@ export class GameManager {
      * Handle a user's answer to a question
      */
     async handleAnswer(username: string, userDisplayName: string, messageText: string): Promise<boolean> {
-        // Chatterino (and maybe others) will add a space and an invisible
-        // Unicode character to get around Twitch spam detection. Remove any
-        // such characters.
-        const answer = stripTrailingInvisibleCharacters(messageText).trim();
-        if (!answer.match(/^[A-Za-z]$/)) {
-            logger('debug', `Ignored invalid trivia answer format: "${answer}"`);
-            return false;
-        }
-
-        // Check if a game is active and ignore any answers outside of the game.
-        if (!this.isGameActive()) {
-            logger('debug', `handleAnswer: function was called while trivia is not active.`);
-            return false;
-        }
-
-        // Make sure the user's answer is one of the valid choices.
-        const numberOfAnswers = this.gameState.askedQuestion.answers.length;
-        const answerIndex = answerLabels.indexOf(answer.toUpperCase());
-        if (answerIndex < 0 || answerIndex >= numberOfAnswers) {
-            logger('debug', `handleAnswer: User ${username} answered with an invalid answer: '${answer}'`);
+        const answerIndex = await this.validateAnswer(messageText);
+        if (answerIndex === -1) {
+            // We aren't logging this because we could end up effectively
+            // logging every single message in chat.
             return false;
         }
 
@@ -295,7 +279,7 @@ export class GameManager {
                 logger('debug', `handleAnswer: User ${username} is not following the channel and cannot answer the question.`);
                 const rejection : AnswerRejectedMetadata = {
                     username: username,
-                    answer: answer,
+                    answerIndex: answerIndex,
                     balance: userBalance,
                     wager: triviaSettings.currencySettings.wager,
                     reasonCode: AnswerRejectionReason.NOT_FOLLOWING,
@@ -315,7 +299,7 @@ export class GameManager {
                 logger('debug', `handleAnswer: User ${username} has already answered the question.`);
                 const rejection: AnswerRejectedMetadata = {
                     username: username,
-                    answer: answer,
+                    answerIndex: answerIndex,
                     balance: userBalance,
                     wager: wager,
                     reasonCode: AnswerRejectionReason.ALREADY_ANSWERED,
@@ -332,7 +316,7 @@ export class GameManager {
 
             // If we get here the user changed their answer. However we don't want
             // to deduct the wager again, so there's no currency adjustment.
-            logger('debug', `handleAnswer: User ${username} changed their answer to ${answer}. Previous answer was ${answerLabels[entry.answerIndex]}. Original wager was ${wager}.`);
+            logger('debug', `handleAnswer: User ${username} changed their answer to ${answerLabels[answerIndex]}. Previous answer was ${answerLabels[entry.answerIndex]}. Original wager was ${wager}.`);
         } else {
             // Check if the user has enough currency to cover an incorrect
             // answer. Adjust their wager downward if insufficient balances are
@@ -342,7 +326,7 @@ export class GameManager {
                     logger('debug', `handleAnswer: User ${username} does not have enough currency to wager ${wager}.`);
                     const rejection: AnswerRejectedMetadata = {
                         username: username,
-                        answer: answer,
+                        answerIndex: answerIndex,
                         balance: userBalance,
                         wager: wager,
                         reasonCode: AnswerRejectionReason.INSUFFICIENT_BALANCE,
@@ -376,7 +360,7 @@ export class GameManager {
 
         // If the user answered correctly, award them the wager amount plus the time bonus.
         if (this.gameState.askedQuestion.correctAnswers.includes(answerIndex)) {
-            logger('debug', `handleAnswer: Trivia answer correct: ${username} answered ${answer}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
+            logger('debug', `handleAnswer: Trivia answer correct: ${username} answered ${answerLabels[answerIndex]}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
 
             const maxBonus = triviaSettings.currencySettings.timeBonus;
             const maxTime = triviaSettings.gameplaySettings.timeLimit;
@@ -392,7 +376,7 @@ export class GameManager {
 
             logger('debug', `handleAnswer: Points calculation for ${username}: totalPoints=${totalPoints} wager=${wager}, timeBonusFactor=${timeBonusFactor}, decayFactor=${triviaSettings.currencySettings.timeBonusDecay}, elapsedTime=${elapsedTime}, maxTime=${maxTime}.`);
         } else {
-            logger('debug', `handleAnswer: Answer incorrect: ${username} answered ${answer}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
+            logger('debug', `handleAnswer: Answer incorrect: ${username} answered ${answerLabels[answerIndex]}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
         }
 
         // Remember the user's answer.
@@ -403,6 +387,36 @@ export class GameManager {
 
         // Successfully recorded the answer.
         return true;
+    }
+
+    async validateAnswer(messageText: string): Promise<number> {
+        // Chatterino (and maybe others) will add a space and an invisible
+        // Unicode character to get around Twitch spam detection. Remove any
+        // such characters.
+        const answer = stripTrailingInvisibleCharacters(messageText).trim();
+
+        // Only single-character answers are valid.
+        if (answer.length !== 1) {
+            // We aren't logging this because we could end up effectively
+            // logging every single message in chat.
+            return -1;
+        }
+
+        // Check if a game is active and ignore any answers outside of the game.
+        if (!this.isGameActive()) {
+            logger('debug', `validateAnswer: Discarding possible trivia answer received while no question is active.`);
+            return -1;
+        }
+
+        // Make sure the user's answer is one of the valid choices.
+        const numberOfAnswers = this.gameState.askedQuestion.answers.length;
+        const answerIndex = answerLabels.indexOf(answer.toUpperCase());
+        if (answerIndex < 0 || answerIndex >= numberOfAnswers) {
+            logger('debug', `validateAnswer: Discarding answer that is outside the range of possible choices: '${answer}'`);
+            return -1;
+        }
+
+        return answerIndex;
     }
 
     /**

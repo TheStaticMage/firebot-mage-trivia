@@ -1,9 +1,9 @@
-import { TriviaGameEffects } from './effects';
 import { TriviaGameEvents } from './events';
 import { FirebotManager } from './firebot';
 import { GameManager } from './game';
 import { getQuestionManager, QuestionManager } from './questions/common';
 import { logger } from './firebot';
+import { registerEffects } from './effects';
 import { registerReplaceVariables } from './variables';
 
 declare const SCRIPTS_DIR: string;
@@ -16,14 +16,12 @@ export class TriviaGame {
     private gameManager: GameManager;
     private firebotManager: FirebotManager;
     private questionManager: QuestionManager;
-    private triviaGameEffects: TriviaGameEffects;
     private triviaGameEvents: TriviaGameEvents;
 
     constructor(firebotManager: FirebotManager) {
         triviaGame = this;
         this.firebotManager = firebotManager;
         this.gameManager = new GameManager(this);
-        this.triviaGameEffects = new TriviaGameEffects(this);
         this.triviaGameEvents = new TriviaGameEvents(this);
     }
 
@@ -60,7 +58,7 @@ export class TriviaGame {
 
     public async onLoad(): Promise<void> {
         registerReplaceVariables(this);
-        this.triviaGameEffects.registerEffects();
+        registerEffects(this);
         this.triviaGameEvents.registerEvents();
     }
 

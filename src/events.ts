@@ -37,7 +37,7 @@ export type AnswerAcceptedMetadata = {
  */
 export type AnswerRejectedMetadata = {
     username: string;
-    answer: string;
+    answerIndex: number;
     balance: number | undefined;
     wager: number | undefined;
     reasonCode: AnswerRejectionReason;
