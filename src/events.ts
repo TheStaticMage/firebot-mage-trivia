@@ -6,8 +6,6 @@ export const TRIVIA_EVENT_SOURCE_NAME = "Mage Trivia Events";
 
 export enum TriviaEvent {
     ANSWER_ACCEPTED = "triviaAnswerAccepted",
-    ANSWER_IGNORED = "triviaAnswerIgnored",
-    ANSWER_INVALID = "triviaAnswerInvalid",
     ANSWER_REJECTED = "triviaAnswerRejected",
     ERROR_CRITICAL = "triviaErrorCritical",
     ERROR_RUNTIME = "triviaErrorRuntime",
@@ -32,24 +30,6 @@ export enum AnswerRejectionReason {
  */
 export type AnswerAcceptedMetadata = {
     usernames: string[];
-}
-
-/**
- * Metadata for an answer that was ignored (TRIVIA_ANSWER_IGNORED_EVENT)
- */
-export type AnswerIgnoredMetadata = {
-    username: string;
-    answer: string;
-    reason: string;
-}
-
-/**
- * Metadata for an answer that was invalid (TRIVIA_ANSWER_INVALID_EVENT)
- */
-export type AnswerInvalidMetadata = {
-    username: string;
-    answer: string;
-    reason: string;
 }
 
 /**
@@ -87,26 +67,6 @@ const eventSource: EventSource = {
             id: TriviaEvent.ANSWER_ACCEPTED,
             name: "Answer Accepted Timer Fired",
             description: "Fires on a periodic basis while a question is active to acknowledge accepted answers.",
-        },
-        {
-            id: TriviaEvent.ANSWER_IGNORED,
-            name: "Answer Ignored",
-            description: "Fires when a user's trivia answer is ignored.",
-            manualMetadata: {
-                username: "firebot",
-                answer: "A",
-                reason: "Example answer ignored message."
-            },
-        },
-        {
-            id: TriviaEvent.ANSWER_INVALID,
-            name: "Answer Invalid",
-            description: "Fires when a user's trivia answer is invalid.",
-            manualMetadata: {
-                username: "firebot",
-                answer: "Z",
-                reason: "Example answer invalid message."
-            },
         },
         {
             id: TriviaEvent.ANSWER_REJECTED,
