@@ -10,8 +10,8 @@ export const mageTriviaAnswerAccepted: ReplaceVariable = {
         possibleDataOutput: ["array"],
         triggers: {
             "manual": true,
-            "event": [TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ANSWER_ACCEPTED],
-        },
+            "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_ACCEPTED}`]
+        }
     },
     evaluator: async (trigger: Effects.Trigger) => {
         const usernames = trigger.metadata.eventData?.usernames as string[];
@@ -21,7 +21,7 @@ export const mageTriviaAnswerAccepted: ReplaceVariable = {
         }
         logger('debug', `mageTriviaAnswerAccepted: ${JSON.stringify(usernames)}`);
         return usernames;
-    },
+    }
 };
 
 export const mageTriviaAnswerRejected: ReplaceVariable = {
@@ -31,8 +31,8 @@ export const mageTriviaAnswerRejected: ReplaceVariable = {
         possibleDataOutput: ["text"],
         triggers: {
             "manual": true,
-            "event": [TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ANSWER_REJECTED],
-        },
+            "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_REJECTED}`]
+        }
     },
     evaluator: async (trigger: Effects.Trigger) => {
         const metadata = trigger.metadata as AnswerRejectedMetadata;
@@ -42,7 +42,7 @@ export const mageTriviaAnswerRejected: ReplaceVariable = {
         }
         logger('debug', `mageTriviaAnswerRejected: ${metadata.reasonMessage}`);
         return metadata.reasonMessage;
-    },
+    }
 };
 
 export const mageTriviaAnswerRejectedRaw: ReplaceVariable = {
@@ -52,8 +52,8 @@ export const mageTriviaAnswerRejectedRaw: ReplaceVariable = {
         possibleDataOutput: ["object"],
         triggers: {
             "manual": true,
-            "event": [TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ANSWER_REJECTED],
-        },
+            "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_REJECTED}`]
+        }
     },
     evaluator: async (trigger: Effects.Trigger) => {
         const metadata = trigger.metadata as AnswerRejectedMetadata;
@@ -63,5 +63,5 @@ export const mageTriviaAnswerRejectedRaw: ReplaceVariable = {
         }
         logger('debug', `mageTriviaAnswerRejectedRaw: ${JSON.stringify(metadata)}`);
         return metadata;
-    },
+    }
 };

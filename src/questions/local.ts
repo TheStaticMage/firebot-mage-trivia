@@ -74,7 +74,7 @@ export class LocalQuestionManager extends QuestionManager {
                 logger('warn', `Reloaded questions from file; there are now ${questionKeys.length} questions in the database.`);
             }
 
-            let answeredQuestions = this.usedQuestionsCache.keys();
+            const answeredQuestions = this.usedQuestionsCache.keys();
             logger('debug', `There are ${answeredQuestions.length} questions that have been answered.`);
 
             let unansweredQuestions = this.getUnansweredQuestions();
@@ -93,7 +93,7 @@ export class LocalQuestionManager extends QuestionManager {
                 reportError(
                     ErrorType.CRITICAL_ERROR,
                     '',
-                    'No questions are available to ask. You either need to add more questions to the trivia file or enable the "Recycle Questions" setting.',
+                    'No questions are available to ask. You either need to add more questions to the trivia file or enable the "Recycle Questions" setting.'
                 );
                 return;
             }
@@ -119,7 +119,7 @@ export class LocalQuestionManager extends QuestionManager {
             reportError(
                 ErrorType.CRITICAL_ERROR,
                 `${filePath}: ${error}`,
-                "Error reading trivia file. Please check the file path and ensure it exists.",
+                "Error reading trivia file. Please check the file path and ensure it exists."
             );
             return;
         }
@@ -136,14 +136,14 @@ export class LocalQuestionManager extends QuestionManager {
             return;
         }
 
-        let file: string = path.basename(filePath, path.extname(filePath));
+        const file: string = path.basename(filePath, path.extname(filePath));
         const questionMap: Map<string, Question> = new Map();
 
-        questions.forEach((question, index) => {
+        questions.forEach((question) => {
             const formattedQuestion: Question = {
                 questionText: question.questionText,
                 correctAnswers: question.answers.filter((answer: any) => answer.isCorrect).map((answer: any) => String(answer.answerText)),
-                incorrectAnswers: question.answers.filter((answer: any) => !answer.isCorrect).map((answer: any) => String(answer.answerText)),
+                incorrectAnswers: question.answers.filter((answer: any) => !answer.isCorrect).map((answer: any) => String(answer.answerText))
             };
 
             if (formattedQuestion.correctAnswers.length === 0) {

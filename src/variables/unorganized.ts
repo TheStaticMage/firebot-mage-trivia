@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-warning-comments
 // TODO: Refactor this file to use the new variable organization.
 // PLEASE DO NOT ADD ANY NEW VARIABLES HERE.
 
@@ -11,7 +12,7 @@ export const mageTriviaGameInProgress: ReplaceVariable = {
     definition: {
         handle: "mageTriviaGameInProgress",
         description: "Returns whether or not a trivia game is in progress.",
-        possibleDataOutput: ["bool"],
+        possibleDataOutput: ["bool"]
     },
     evaluator: async () => {
         const data = triviaGame.getGameManager().isGameActive();
@@ -24,7 +25,7 @@ export const mageTriviaQuestionAndAnswersRaw: ReplaceVariable = {
     definition: {
         handle: "mageTriviaQuestionAndAnswersRaw",
         description: "Returns the current or most recently asked question and answer choices (raw object).",
-        possibleDataOutput: ["object"],
+        possibleDataOutput: ["object"]
     },
     evaluator: async () => {
         const question = triviaGame.getGameManager().getQuestion();
@@ -33,14 +34,14 @@ export const mageTriviaQuestionAndAnswersRaw: ReplaceVariable = {
             return {};
         }
         return question;
-    },
+    }
 };
 
 export const mageTriviaQuestion: ReplaceVariable = {
     definition: {
         handle: "mageTriviaQuestion",
         description: "Returns the text of the current or most-recently-asked question.",
-        possibleDataOutput: ["text"],
+        possibleDataOutput: ["text"]
     },
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
@@ -49,14 +50,14 @@ export const mageTriviaQuestion: ReplaceVariable = {
             return "";
         }
         return aq.question.questionText;
-    },
+    }
 };
 
 export const mageTriviaAnswers: ReplaceVariable = {
     definition: {
         handle: "mageTriviaAnswers",
         description: "Returns an array with the answers (with their letters) of the current or most-recently-asked question.",
-        possibleDataOutput: ["array"],
+        possibleDataOutput: ["array"]
     },
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
@@ -69,14 +70,14 @@ export const mageTriviaAnswers: ReplaceVariable = {
         });
         logger('debug', `mageTriviaAnswers: ${JSON.stringify(answers)}`);
         return answers;
-    },
+    }
 };
 
 export const mageTriviaCorrectAnswers: ReplaceVariable = {
     definition: {
         handle: "mageTriviaCorrectAnswers",
         description: "Returns an array with the correct answers (with their letters) of the current or most-recently-asked question.",
-        possibleDataOutput: ["array"],
+        possibleDataOutput: ["array"]
     },
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
@@ -89,14 +90,14 @@ export const mageTriviaCorrectAnswers: ReplaceVariable = {
         });
         logger('debug', `mageTriviaCorrectAnswers: ${JSON.stringify(correctAnswers)}`);
         return correctAnswers;
-    },
+    }
 };
 
 export const mageTriviaPossibleAnswers: ReplaceVariable = {
     definition: {
         handle: "mageTriviaPossibleAnswers",
         description: "Returns an array of the possible answer letters for the current or most-recently-asked question.",
-        possibleDataOutput: ["array"],
+        possibleDataOutput: ["array"]
     },
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
@@ -107,14 +108,14 @@ export const mageTriviaPossibleAnswers: ReplaceVariable = {
         const possibleAnswers = aq.answers.map((_, index) => answerLabels[index]);
         logger('debug', `mageTriviaPossibleAnswers: ${JSON.stringify(possibleAnswers)}`);
         return possibleAnswers;
-    },
+    }
 };
 
 export const mageTriviaGameResultsRaw: ReplaceVariable = {
     definition: {
         handle: "mageTriviaGameResultsRaw",
         description: "Returns the raw object containing the results of the last trivia game played. (An empty object is returned if the game is not completed.)",
-        possibleDataOutput: ["object"],
+        possibleDataOutput: ["object"]
     },
     evaluator: async () => {
         const lastGameResults = triviaGame.getGameManager().getGameState();
@@ -129,14 +130,14 @@ export const mageTriviaGameResultsRaw: ReplaceVariable = {
 
         logger('debug', `mageTriviaGameResultsRaw: ${JSON.stringify(lastGameResults)}`);
         return lastGameResults;
-    },
+    }
 };
 
 export const mageTriviaWinners: ReplaceVariable = {
     definition: {
         handle: "mageTriviaWinners",
         description: "Returns an array of the winners of the last trivia game played. (An empty array is returned if the game is not completed.)",
-        possibleDataOutput: ["array"],
+        possibleDataOutput: ["array"]
     },
     evaluator: async () => {
         const lastGameResults = triviaGame.getGameManager().getGameState();
@@ -153,14 +154,14 @@ export const mageTriviaWinners: ReplaceVariable = {
         });
         logger('debug', `mageTriviaWinners: ${JSON.stringify(winners)}`);
         return winners;
-    },
+    }
 };
 
 export const mageTriviaWinnersWithPoints: ReplaceVariable = {
     definition: {
         handle: "mageTriviaWinnersWithPoints",
         description: "Returns an array of the winners of the last trivia game played with their points. (An empty array is returned if the game is not completed.)",
-        possibleDataOutput: ["array"],
+        possibleDataOutput: ["array"]
     },
     evaluator: async () => {
         const lastGameResults = triviaGame.getGameManager().getGameState();
@@ -177,7 +178,7 @@ export const mageTriviaWinnersWithPoints: ReplaceVariable = {
         });
         logger('debug', `mageTriviaLastGameWinnersWithPoints: ${JSON.stringify(winnersWithPoints)}`);
         return winnersWithPoints;
-    },
+    }
 };
 
 function getAskedQuestion(triviaGame: TriviaGame): askedQuestion | undefined {

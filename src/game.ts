@@ -1,7 +1,7 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
-import { AnswerAcceptedMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent, } from './events';
+import { AnswerAcceptedMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
@@ -90,7 +90,7 @@ export class GameManager {
                 ErrorType.RUNTIME_ERROR,
                 '',
                 'Cancel Trivia Question was called while there was not an active trivia game.',
-                trigger,
+                trigger
             );
             return;
         }
@@ -125,7 +125,7 @@ export class GameManager {
                 ErrorType.RUNTIME_ERROR,
                 '',
                 'Create Trivia Question effect was called while there was already an active trivia question.',
-                trigger,
+                trigger
             );
             return;
         }
@@ -140,7 +140,7 @@ export class GameManager {
                 ErrorType.CRITICAL_ERROR,
                 '',
                 'Could not get a question to create trivia game.',
-                trigger,
+                trigger
             );
             return;
         }
@@ -158,13 +158,13 @@ export class GameManager {
         const self = this;
         this.answerAcceptedTimer = setTimeout(() =>
             self.answerAcceptedHandler(true),
-            triviaSettings.otherSettings.confirmationInterval * 1000
+        triviaSettings.otherSettings.confirmationInterval * 1000
         );
 
         // Set the end-of-game timer.
         const answerTimeout = triviaSettings.gameplaySettings.timeLimit;
         this.questionTimer = setTimeout(() => {
-            self.endGame(trigger);
+            self.endGame();
         }, answerTimeout * 1000);
 
         // Emit the start event.
@@ -175,7 +175,7 @@ export class GameManager {
     /**
      * End the current game
      */
-    async endGame(trigger: Effects.Trigger): Promise<void> {
+    async endGame(): Promise<void> {
         // Make sure there's actually a question in progress.
         if (!this.isGameActive()) {
             logger('warn', `endGame: function was called while trivia is not active.`);
@@ -194,7 +194,7 @@ export class GameManager {
         // stats in the game state.
         const winnerPoints = new Map<string, number>();
         this.answerCache.keys().forEach((user) => {
-            let cacheEntry = this.answerCache.get<AnswerEntry>(user);
+            const cacheEntry = this.answerCache.get<AnswerEntry>(user);
             if (cacheEntry?.correct) {
                 logger('debug', `User ${user} answered the question correctly. Awarding ${cacheEntry.award} points (includes refunding wager of ${cacheEntry.wager}).`);
                 this.triviaGame.getFirebotManager().adjustCurrencyForUser(cacheEntry.award, user);
@@ -219,18 +219,18 @@ export class GameManager {
         }
 
         this.gameState.losers = Array.from(this.answerCache.keys())
-            .filter((user) => !this.answerCache.get<AnswerEntry>(user)?.correct)
+            .filter(user => !this.answerCache.get<AnswerEntry>(user)?.correct)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
                 return { username: username, userDisplayName: entry.userDisplayName || username, answer: entry?.answerIndex || -1, points: entry?.wager || 0 };
-            }),
+            });
 
         this.gameState.winners = Array.from(winnerPoints.keys())
-            .filter((user) => winnerPoints.get(user) !== undefined)
+            .filter(user => winnerPoints.get(user) !== undefined)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
                 return { username: username, userDisplayName: entry.userDisplayName || username, answer: entry?.answerIndex || -1, points: winnerPoints.get(username) || 0 };
-            }),
+            });
 
         this.gameState.complete = true;
         this.gameState.active = false;
@@ -325,7 +325,7 @@ export class GameManager {
                 return false;
             }
 
-            if (entry.answerIndex == answerIndex) {
+            if (entry.answerIndex === answerIndex) {
                 logger('debug', `handleAnswer: User ${username} has already answered the question with the same answer.`);
                 return false;
             }
@@ -376,7 +376,7 @@ export class GameManager {
 
         // If the user answered correctly, award them the wager amount plus the time bonus.
         if (this.gameState.askedQuestion.correctAnswers.includes(answerIndex)) {
-            logger('debug', `handleAnswer: Trivia answer correct: ${username} answered ${answer}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map((index) => answerLabels[index]).join(', ')}.`);
+            logger('debug', `handleAnswer: Trivia answer correct: ${username} answered ${answer}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
 
             const maxBonus = triviaSettings.currencySettings.timeBonus;
             const maxTime = triviaSettings.gameplaySettings.timeLimit;
@@ -392,7 +392,7 @@ export class GameManager {
 
             logger('debug', `handleAnswer: Points calculation for ${username}: totalPoints=${totalPoints} wager=${wager}, timeBonusFactor=${timeBonusFactor}, decayFactor=${triviaSettings.currencySettings.timeBonusDecay}, elapsedTime=${elapsedTime}, maxTime=${maxTime}.`);
         } else {
-            logger('debug', `handleAnswer: Answer incorrect: ${username} answered ${answer}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map((index) => answerLabels[index]).join(', ')}.`);
+            logger('debug', `handleAnswer: Answer incorrect: ${username} answered ${answer}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
         }
 
         // Remember the user's answer.
@@ -416,7 +416,7 @@ export class GameManager {
         if (usernames.length > 0) {
             logger('debug', `answerAcceptedHandler: Trivia answers accepted for: ${usernames.join(', ')}`);
             const locked: AnswerAcceptedMetadata = {
-                usernames: usernames.sort(),
+                usernames: usernames.sort()
             };
             this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_ACCEPTED, locked, false);
             this.answersAccepted.flushAll();
@@ -426,7 +426,7 @@ export class GameManager {
         if (reschedule) {
             this.answerAcceptedTimer = setTimeout(() =>
                 this.answerAcceptedHandler(true),
-                triviaSettings.otherSettings.confirmationInterval * 1000
+            triviaSettings.otherSettings.confirmationInterval * 1000
             );
         } else if (this.answerAcceptedTimer) {
             clearTimeout(this.answerAcceptedTimer);

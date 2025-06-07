@@ -8,7 +8,7 @@ import { registerReplaceVariables } from './variables';
 
 declare const SCRIPTS_DIR: string;
 
-export var triviaGame: TriviaGame;
+export let triviaGame: TriviaGame;
 
 const usedQuestionsPath = 'firebot-mage-trivia-data/used-questions.json';
 
