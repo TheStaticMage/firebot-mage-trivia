@@ -1,3 +1,3 @@
 # Customization and Integration Guide
 
-Documentation coming soon.
+## Displaying the question on-screen

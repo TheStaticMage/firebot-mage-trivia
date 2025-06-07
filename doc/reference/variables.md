@@ -12,6 +12,7 @@
 - [`$mageTriviaPossibleAnswers`](#magetriviapossibleanswers)
 - [`$mageTriviaQuestion`](#magetriviaquestion)
 - [`$mageTriviaQuestionAndAnswersRaw`](#magetriviaquestionandanswersraw)
+- [`$mageTriviaWinners`](#magetriviawinners)
 - [`$mageTriviaWinnersWithPoints`](#magetriviawinnerswithpoints)
 
 ## `$arrayJoinWith`
@@ -176,12 +177,38 @@ This is a string with the error message from the [Critical Error](/doc/reference
 $mageTriviaError => String
 
 $mageTriviaError
-=> The error message goes here
+=> An error was encountered when reading the question file
 ```
 
 #### Notes & Limitations
 
 This variable is only available for the _Critial Error_ and _Runtime Error_ events. Firebot will not recognize the variable in other contexts.
+
+Although we do not recommend posting these error messages in chat, this variable will contain only pre-determined messages that will not leak information such as file paths that could dox the streamer.
+
+## `$mageTriviaErrorFullDONOTUSETHISINCHAT`
+
+#### Description
+
+This is a string with the error message from the [Critical Error](/doc/reference/events.md#critical-error) or [Runtime Error](/doc/reference/events.md#runtime-error) event.
+
+If enabled in [advanced settings](/doc/reference/settings.md#enable-the-magetriviaerrorfull_do_not_use_this_in_chat-variable), it will include more details about the error, including the exact error from the operating system. (If you have not enabled it in the advanced settings, this will be equivalent to [`$mageTriviaError`](#magetriviaerror). This is for your safety.)
+
+:warning: **As the name implies, NEVER use this variable in a message that you are posting to your chat. The error message might include something like a file path, which could include some or all of your name, and therefore "dox" you.**
+
+#### Usage & Examples
+
+```
+// Only when handling Critical Error or Runtime Error
+$mageTriviaErrorFullDONOTUSETHISINCHAT => String
+
+$mageTriviaErrorFullDONOTUSETHISINCHAT
+=> Error reading trivia file: /home/your-real-name-here/trivia.yaml: Error: ENOENT: no such file or directory, open '/home/your-real-name-here/trivia.yaml'
+```
+
+#### Notes & Limitations
+
+- This variable is only available for the _Critial Error_ and _Runtime Error_ events. Firebot will not recognize the variable in other contexts.
 
 ## `$mageTriviaGameInProgress`
 
@@ -259,6 +286,29 @@ This variable is available without restriction, but it is only populated when a 
 
 For advanced use cases. [See source code](/src/variables.ts)
 
+## `$mageTriviaWinners`
+
+#### Description
+
+This is an array of users who correctly answered the most recently ended question.
+
+Each element of the array contains the display name of the user.
+
+If you want the winners and points earned by each, see [`$mageTriviaWinnersWithPoints`](#magetriviawinnerswithpoints).
+
+#### Usage & Examples
+
+```
+$mageTriviaWinners => Array
+
+$mageTriviaWinners
+=> ["TheStaticMage", "TheStaticBrock", "Firebot"]
+```
+
+#### Notes & Limitations
+
+This variable is available without restriction, but it is only populated when a question has ended. If this variable is called before a question has been asked in this Firebot session or while a question is active, an empty array (`[]`) is returned.
+
 ## `$mageTriviaWinnersWithPoints`
 
 #### Description
@@ -266,6 +316,8 @@ For advanced use cases. [See source code](/src/variables.ts)
 This is an array of users who correctly answered the most recently ended question, and the points awarded to each.
 
 Each element of the array contains the display name of the user and the points awarded.
+
+If you want just the names of the winners, see [`$mageTriviaWinners`](#magetriviawinners).
 
 #### Usage & Examples
 
@@ -292,4 +344,4 @@ You can also detect the case when there were no correct answers to the question 
 
 #### Notes & Limitations
 
-This variable is available without restriction, but it is only populated when a question has ended. If this variable is used before a question has been asked in this Firebot session or while a question is active, an empty array (`[]`) is returned.
+This variable is available without restriction, but it is only populated when a question has ended. If this variable is called before a question has been asked in this Firebot session or while a question is active, an empty array (`[]`) is returned.
