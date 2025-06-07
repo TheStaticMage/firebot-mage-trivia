@@ -4,7 +4,7 @@ import { FirebotManager } from './firebot';
 import { GameManager } from './game';
 import { getQuestionManager, QuestionManager } from './questions/common';
 import { logger } from './firebot';
-import { registerCustomVariables } from './variables';
+import { registerReplaceVariables } from './variables';
 
 declare const SCRIPTS_DIR: string;
 
@@ -59,7 +59,7 @@ export class TriviaGame {
     }
 
     public async onLoad(): Promise<void> {
-        registerCustomVariables(this);
+        registerReplaceVariables(this);
         this.triviaGameEffects.registerEffects();
         this.triviaGameEvents.registerEvents();
     }
