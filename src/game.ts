@@ -1,21 +1,13 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
+import { AnswerAcceptedMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent, } from './events';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
 import { ErrorType, reportError } from './util/errors';
+import { stripTrailingInvisibleCharacters } from './util/text';
 import { TwitchUtil } from './util/twitch';
-
-import {
-    AnswerAcceptedMetadata,
-    AnswerIgnoredMetadata,
-    AnswerInvalidMetadata,
-    AnswerRejectedMetadata,
-    AnswerRejectionReason,
-    TRIVIA_EVENT_SOURCE_ID,
-    TriviaEvent,
-} from './events';
 
 /**
  * Entry for a user's answer to a question
@@ -239,39 +231,33 @@ export class GameManager {
     /**
      * Handle a user's answer to a question
      */
-    async handleAnswer(username: string, userDisplayName: string, answer: string): Promise<boolean> {
-        const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
-        const userBalance = await this.triviaGame.getFirebotManager().getUserCurrencyTotal(username);
-        let wager = triviaSettings.currencySettings.wager;
-
-        // Check if a game is active.
-        if (!this.isGameActive()) {
-            logger('warn', `handleAnswer: function was called while trivia is not active.`);
-            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_REJECTED, {
-                username: username,
-                answer: answer,
-                balance: userBalance,
-                wager: wager,
-                reasonCode: AnswerRejectionReason.INTERNAL_ERROR,
-                reasonMessage: "No game is active"
-            }, false);
+    async handleAnswer(username: string, userDisplayName: string, messageText: string): Promise<boolean> {
+        // Chatterino (and maybe others) will add a space and an invisible
+        // Unicode character to get around Twitch spam detection. Remove any
+        // such characters.
+        const answer = stripTrailingInvisibleCharacters(messageText).trim();
+        if (!answer.match(/^[A-Za-z]$/)) {
+            logger('debug', `Ignored invalid trivia answer format: "${answer}"`);
             return false;
         }
 
-        // Note: Answer has been validated to be a single character when passed
-        // in from the effect trigger.
+        // Check if a game is active and ignore any answers outside of the game.
+        if (!this.isGameActive()) {
+            logger('debug', `handleAnswer: function was called while trivia is not active.`);
+            return false;
+        }
+
+        // Make sure the user's answer is one of the valid choices.
         const numberOfAnswers = this.gameState.askedQuestion.answers.length;
         const answerIndex = answerLabels.indexOf(answer.toUpperCase());
         if (answerIndex < 0 || answerIndex >= numberOfAnswers) {
             logger('debug', `handleAnswer: User ${username} answered with an invalid answer: '${answer}'`);
-            const invalidAnswer: AnswerInvalidMetadata = {
-                username: username,
-                answer: answer,
-                reason: `Answer must be one of ${answerLabels.slice(0, numberOfAnswers).join(', ')}.`
-            };
-            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_INVALID, invalidAnswer, false);
             return false;
         }
+
+        const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
+        const userBalance = await this.triviaGame.getFirebotManager().getUserCurrencyTotal(username);
+        let wager = triviaSettings.currencySettings.wager;
 
         // Follower requirement.
         if (triviaSettings.gameplaySettings.requireFollowing) {
@@ -326,12 +312,6 @@ export class GameManager {
 
             if (entry.answerIndex == answerIndex) {
                 logger('debug', `handleAnswer: User ${username} has already answered the question with the same answer.`);
-                const ignoredAnswer: AnswerIgnoredMetadata = {
-                    username: username,
-                    answer: answer,
-                    reason: "You have already answered this question with the same answer."
-                };
-                this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_IGNORED, ignoredAnswer, false);
                 return false;
             }
 

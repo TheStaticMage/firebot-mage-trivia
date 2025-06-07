@@ -2,7 +2,6 @@ import { Firebot } from '@crowbartools/firebot-custom-scripts-types';
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
-import { stripTrailingInvisibleCharacters } from './util/text';
 
 export const TRIVIA_ANSWER_EFFECT_ID = "magetrivia:trivia:answer";
 export const TRIVIA_ANSWER_EFFECT_NAME = "[Mage Trivia] Process Trivia Answer";
@@ -63,29 +62,12 @@ export class TriviaGameEffects {
         }
 
         // Get the message text from the trigger.
-        let messageText = trigger.metadata.eventData?.messageText as string;
+        const messageText = trigger.metadata.eventData?.messageText as string;
         if (!messageText) {
             logger('warn', `Trivia answer event called without message text`);
             return;
         }
 
-        // Chatterino (and maybe others) will add a space and an invisible
-        // Unicode character to get around Twitch spam detection. Remove any
-        // such characters.
-        messageText = stripTrailingInvisibleCharacters(messageText);
-        messageText = messageText.trim();
-
-        // Validate the answer format (single letter) as a sanity check. Here we
-        // allow for any letter but we suggest that the regular expression be
-        // updated to match the specific number of trivia answers that are
-        // expected.
-        if (!messageText.match(/^[A-Za-z]$/)) {
-            logger('debug', `Ignored invalid trivia answer format: "${messageText}"`);
-            return;
-        }
-
-        // Submit the answer to the handler
-        logger('debug', `User ${username} submitted answer "${messageText}" for trivia question`);
         await this.triviaGame.getGameManager().handleAnswer(username, userDisplayName, messageText);
     }
 
