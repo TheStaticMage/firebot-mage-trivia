@@ -1,5 +1,5 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
-import { TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
+import { ErrorMetadata, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
 import { logger } from '../firebot';
 import { triviaGame } from '../globals';
 
@@ -8,19 +8,21 @@ export enum ErrorType {
     RUNTIME_ERROR = 'Runtime Error',
 }
 
-export function reportError(errorType: ErrorType, errorMessage: string, trigger?: Effects.Trigger): void {
+export function reportError(errorType: ErrorType, fullErrorMessage: string, safeErrorMessage: string, trigger?: Effects.Trigger): void {
+    // Full message is not always set.
+    const loggedMessage = fullErrorMessage ? `${safeErrorMessage} ${fullErrorMessage}` : safeErrorMessage;
+    const metadata: ErrorMetadata = {
+        safeMessage: safeErrorMessage,
+        message: fullErrorMessage,
+        trigger: trigger
+    };
+    logger('debug', `Reporting error: ${loggedMessage} with metadata: ${JSON.stringify(metadata)}`);
+
     if (errorType === ErrorType.CRITICAL_ERROR) {
-        logger('error', `Critical error occurred: ${errorMessage}`);
-        triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ERROR_CRITICAL, {
-            message: errorMessage,
-            trigger: trigger,
-        }, false);
-    }
-    else if (errorType === ErrorType.RUNTIME_ERROR) {
-        logger('warn', `Runtime error occurred: ${errorMessage}`);
-        triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ERROR_RUNTIME, {
-            message: errorMessage,
-            trigger: trigger,
-        }, false);
+        logger('error', `Critical error occurred: ${loggedMessage}`);
+        triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ERROR_CRITICAL, metadata, false);
+    } else if (errorType === ErrorType.RUNTIME_ERROR) {
+        logger('warn', `Runtime error occurred: ${loggedMessage}`);
+        triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ERROR_RUNTIME, metadata, false);
     }
 }

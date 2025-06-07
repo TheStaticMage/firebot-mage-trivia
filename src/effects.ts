@@ -2,7 +2,6 @@ import { Firebot } from '@crowbartools/firebot-custom-scripts-types';
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
-import { stripTrailingInvisibleCharacters } from './util/text';
 
 export const TRIVIA_ANSWER_EFFECT_ID = "magetrivia:trivia:answer";
 export const TRIVIA_ANSWER_EFFECT_NAME = "[Mage Trivia] Process Trivia Answer";
@@ -22,14 +21,14 @@ export class TriviaGameEffects {
      * Creates the effect for submitting a trivia answer
      * @returns The effect definition
      */
-    private AnswerEffect(): Firebot.EffectType<{}> {
+    private answerEffect(): Firebot.EffectType<object> {
         return {
             definition: {
                 id: TRIVIA_ANSWER_EFFECT_ID,
                 name: TRIVIA_ANSWER_EFFECT_NAME,
                 description: "Record the answer to a trivia question.",
                 icon: "fad fa-comment-alt",
-                categories: ["scripting"],
+                categories: ["scripting"]
             },
             optionsTemplate: "",
             optionsController: () => {},
@@ -38,8 +37,8 @@ export class TriviaGameEffects {
             },
             onTriggerEvent: async (event) => {
                 return await this.answerOnTrigger(event.trigger);
-            },
-        }
+            }
+        };
     }
 
     /**
@@ -63,29 +62,12 @@ export class TriviaGameEffects {
         }
 
         // Get the message text from the trigger.
-        let messageText = trigger.metadata.eventData?.messageText as string;
+        const messageText = trigger.metadata.eventData?.messageText as string;
         if (!messageText) {
             logger('warn', `Trivia answer event called without message text`);
             return;
         }
 
-        // Chatterino (and maybe others) will add a space and an invisible
-        // Unicode character to get around Twitch spam detection. Remove any
-        // such characters.
-        messageText = stripTrailingInvisibleCharacters(messageText);
-        messageText = messageText.trim();
-
-        // Validate the answer format (single letter) as a sanity check. Here we
-        // allow for any letter but we suggest that the regular expression be
-        // updated to match the specific number of trivia answers that are
-        // expected.
-        if (!messageText.match(/^[A-Za-z]$/)) {
-            logger('debug', `Ignored invalid trivia answer format: "${messageText}"`);
-            return;
-        }
-
-        // Submit the answer to the handler
-        logger('debug', `User ${username} submitted answer "${messageText}" for trivia question`);
         await this.triviaGame.getGameManager().handleAnswer(username, userDisplayName, messageText);
     }
 
@@ -93,14 +75,14 @@ export class TriviaGameEffects {
      * Creates the effect for canceling a trivia game
      * @returns The effect definition
      */
-    private CancelGameEffect(): Firebot.EffectType<{}> {
+    private cancelGameEffect(): Firebot.EffectType<object> {
         return {
             definition: {
                 id: TRIVIA_CANCEL_QUESTION_EFFECT_ID,
                 name: TRIVIA_CANCEL_QUESTION_EFFECT_NAME,
                 description: "Cancel the current trivia question.",
                 icon: "fad fa-ban",
-                categories: ["scripting"],
+                categories: ["scripting"]
             },
             optionsTemplate: "",
             optionsController: () => {},
@@ -108,32 +90,24 @@ export class TriviaGameEffects {
                 return [];
             },
             onTriggerEvent: async (event) => {
-                return await this.cancelGameOnTrigger(event.trigger);
-            },
-        }
-    }
-
-    /**
-     * Handles the cancellation of a game through an effect trigger
-     * @param trigger - The effect trigger event
-     */
-    private async cancelGameOnTrigger(trigger: Effects.Trigger): Promise<void> {
-        logger('debug', `Called effect: ${TRIVIA_CANCEL_QUESTION_EFFECT_NAME}`);
-        await this.triviaGame.getGameManager().cancelGame(trigger);
+                logger('debug', `Called effect: ${TRIVIA_CANCEL_QUESTION_EFFECT_NAME}`);
+                await this.triviaGame.getGameManager().cancelGame(event.trigger);
+            }
+        };
     }
 
     /**
      * Creates trivia game
      * @returns The effect definition
      */
-    private CreateGameEffect(): Firebot.EffectType<{}> {
+    private createGameEffect(): Firebot.EffectType<object> {
         return {
             definition: {
                 id: TRIVIA_CREATE_QUESTION_EFFECT_ID,
                 name: TRIVIA_CREATE_QUESTION_EFFECT_NAME,
                 description: "Start a trivia question.",
                 icon: "fad fa-question-circle",
-                categories: ["scripting"],
+                categories: ["scripting"]
             },
             optionsTemplate: "",
             optionsController: () => {},
@@ -141,18 +115,10 @@ export class TriviaGameEffects {
                 return [];
             },
             onTriggerEvent: async (event) => {
-                return await this.createGameOnTrigger(event.trigger);
-            },
-        }
-    }
-
-    /**
-     * Handles the creation of a game through an effect trigger
-     * @param trigger - The effect trigger event
-     */
-    private async createGameOnTrigger(trigger: Effects.Trigger): Promise<void> {
-        logger('debug', `Called effect: ${TRIVIA_CREATE_QUESTION_EFFECT_NAME}`);
-        await this.triviaGame.getGameManager().createGame(trigger);
+                logger('debug', `Called effect: ${TRIVIA_CREATE_QUESTION_EFFECT_NAME}`);
+                await this.triviaGame.getGameManager().createGame(event.trigger);
+            }
+        };
     }
 
     /**
@@ -160,9 +126,9 @@ export class TriviaGameEffects {
      */
     public registerEffects(): void {
         try {
-            this.triviaGame.getFirebotManager().registerEffect(this.AnswerEffect());
-            this.triviaGame.getFirebotManager().registerEffect(this.CancelGameEffect());
-            this.triviaGame.getFirebotManager().registerEffect(this.CreateGameEffect());
+            this.triviaGame.getFirebotManager().registerEffect(this.answerEffect());
+            this.triviaGame.getFirebotManager().registerEffect(this.cancelGameEffect());
+            this.triviaGame.getFirebotManager().registerEffect(this.createGameEffect());
             logger('info', "Trivia effects successfully registered");
         } catch (error) {
             logger('error', `Failed to register effects: ${error}`);

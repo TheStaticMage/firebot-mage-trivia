@@ -91,7 +91,7 @@ Bug reports and feature requests are welcome via [GitHub Issues](https://github.
 
 ## Contributing
 
-Contributions are welcome via [Pull Requests](https://github.com/TheStaticMage/firebot-mage-trivia/pulls). I _strongly suggest_ that you contact me before making significant changes, because I'd feel really bad if you spent a lot of time working on something that is not consistent with my vision for the project.
+Contributions are welcome via [Pull Requests](https://github.com/TheStaticMage/firebot-mage-trivia/pulls). I _strongly suggest_ that you contact me before making significant changes, because I'd feel really bad if you spent a lot of time working on something that is not consistent with my vision for the project. Please refer to the [Mage Trivia Contribution Guidelines](/.github/contributing.md) for specifics.
 
 ## License
 

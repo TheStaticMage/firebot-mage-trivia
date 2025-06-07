@@ -24,15 +24,15 @@ export const arrayJoinWith : ReplaceVariable = {
             }
         ],
         categories: ["text"],
-        possibleDataOutput: ["text"],
+        possibleDataOutput: ["text"]
     },
 
     evaluator: (
         _,
         subject: string | unknown[],
-        lastWord : string = ""
+        lastWord = ""
     ) : string => {
-        var items: string[] = [];
+        let items: string[] = [];
 
         if (typeof subject === 'string' || subject instanceof String) {
             try {
@@ -52,9 +52,8 @@ export const arrayJoinWith : ReplaceVariable = {
             return items[0];
         } else if (items.length === 2) {
             return `${items[0]} ${lastWord} ${items[1]}`;
-        } else {
-            const lastItem = items.pop();
-            return `${items.join(', ')} ${lastWord} ${lastItem}`;
         }
+        const lastItem = items.pop();
+        return `${items.join(', ')} ${lastWord} ${lastItem}`;
     }
 };
