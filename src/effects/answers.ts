@@ -1,0 +1,94 @@
+import { Firebot } from '@crowbartools/firebot-custom-scripts-types';
+import { EffectTriggerResponse } from '@crowbartools/firebot-custom-scripts-types/types/effects';
+import { logger } from '../firebot';
+import { triviaGame } from '../globals';
+
+const TRIVIA_ANSWER_EFFECT_ID = "magetrivia:trivia:answer";
+const TRIVIA_ANSWER_EFFECT_NAME = "[Mage Trivia] Process Trivia Answer";
+
+const TRIVIA_ANSWER_VALIDATE_EFFECT_ID = "magetrivia:trivia:validateAnswer";
+const TRIVIA_ANSWER_VALIDATE_EFFECT_NAME = "[Mage Trivia] Validate Trivia Answer";
+
+type answerInput = Record<string, never>;
+
+export const answerEffect: Firebot.EffectType<answerInput> = {
+    definition: {
+        id: TRIVIA_ANSWER_EFFECT_ID,
+        name: TRIVIA_ANSWER_EFFECT_NAME,
+        description: "Record the answer to a trivia question.",
+        icon: "fad fa-comment-alt",
+        categories: ["scripting"]
+    },
+    optionsTemplate: "",
+    optionsController: () => {},
+    optionsValidator: () => {
+        return [];
+    },
+    onTriggerEvent: async (event) => {
+        // Get user info
+        const username = event.trigger?.metadata?.username as string;
+        if (!username) {
+            logger('error', 'Cannot process trivia answer: No username provided');
+            return;
+        }
+
+        // Get user display name from the trigger
+        let userDisplayName = event.trigger?.metadata?.eventData?.userDisplayName as string;
+        if (!userDisplayName) {
+            // If no display name is provided, use the username as a fallback
+            userDisplayName = username;
+            logger('warn', `No user display name provided for username "${username}", using username as display name.`);
+        }
+
+        // Get the message text from the trigger.
+        const messageText = event.trigger?.metadata?.eventData?.messageText as string;
+        if (!messageText) {
+            logger('warn', `Trivia answer event called without message text`);
+            return;
+        }
+
+        await triviaGame.getGameManager().handleAnswer(username, userDisplayName, messageText);
+    }
+};
+
+export const validateAnswerEffect: Firebot.EffectType<answerInput> = {
+    definition: {
+        id: TRIVIA_ANSWER_VALIDATE_EFFECT_ID,
+        name: TRIVIA_ANSWER_VALIDATE_EFFECT_NAME,
+        description: "Check if the input is a valid trivia answer for an in-progress game.",
+        icon: "fad fa-check-circle",
+        categories: ["scripting"],
+        outputs: [
+            {
+                label: "Valid Answer",
+                defaultName: "isValidAnswer",
+                description: "True or false depending on whether the input appears to be a trivia answer for an in-progress game."
+            }
+        ]
+
+    },
+    optionsTemplate: "",
+    optionsController: () => {},
+    optionsValidator: () => {
+        return [];
+    },
+    onTriggerEvent: async (event): Promise<EffectTriggerResponse> => {
+        const messageText = event.trigger?.metadata?.eventData?.messageText as string;
+        if (!messageText) {
+            logger('warn', `Called effect: ${TRIVIA_ANSWER_VALIDATE_EFFECT_NAME} without message text`);
+            return {
+                success: false,
+                outputs: {}
+            };
+        }
+
+        const answerIndex = await triviaGame.getGameManager().validateAnswer(messageText);
+        logger('debug', `Called effect: ${TRIVIA_ANSWER_VALIDATE_EFFECT_NAME} with messageText: "${messageText}" and got result: ${answerIndex !== -1}`);
+        return {
+            success: true,
+            outputs: {
+                isValidAnswer: answerIndex !== -1
+            }
+        };
+    }
+};

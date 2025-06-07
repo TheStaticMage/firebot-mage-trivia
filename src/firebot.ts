@@ -92,7 +92,7 @@ export class FirebotManager {
         }
     }
 
-    public registerEffect(effect: Effects.EffectType<{}>): void {
+    public registerEffect(effect: Effects.EffectType<object>): void {
         const { effectManager } = this.firebot.modules;
         effectManager.registerEffect(effect);
     }
