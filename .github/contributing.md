@@ -8,19 +8,23 @@ This repository does not require you to create an issue or get prior approval. Y
 
 However, if you're considering significant changes or something that would take you a considerable amount of time, I would _strongly encourage_ you to ask in advance. You can open a GitHub issue to do this. I would really feel bad if I had to reject a contribution that you spent a bunch of time on because it is not consistent with the vision or roadmap of this project.
 
+## Development Guide
+
+- Any code that you submit needs to pass the linter (ESLint).
+- Please update any documentation (see the [doc](/doc) directory) as necessary.
+
 ## Branches
 
 The `main` branch is considered stable. It is the branch against which all Pull Requests should be targeted. Releases are occasionally cut from this branch as well.
 
 Please ensure that your branch has been brought up-to-date with `main` when you start your work, and keep it up-to-date as you go along. I wouldn't want you to have to spend a bunch of time resolving merge conflicts because you targeted an old version of the `main` branch.
 
+There is no specific formatting requirement for commit messages. Please use a descriptive phrase indicating what you did. Commits will be squashed upon merge.
+
 ## Pull Requests
 
-Please use the provided Pull Request template. I may close any PRs that do not use the template or are missing necessary sections.
-
-### Commit Messages
-
-There is no specific formatting requirement for commit messages. Please use a descriptive phrase indicating what you did. Commits will be squashed upon merge.
+- Please use the provided Pull Request template. I may close any PRs that do not use the template or are missing necessary sections.
+- When you are ready for a review, on your PR under "Reviewers" add TheStaticMage.
 
 ### Title
 
