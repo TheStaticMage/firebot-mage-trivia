@@ -5,6 +5,7 @@ import { getQuestionManager, QuestionManager } from './questions/common';
 import { logger } from './firebot';
 import { registerEffects } from './effects';
 import { registerReplaceVariables } from './variables';
+import { registerEventFilters } from './filters';
 
 declare const SCRIPTS_DIR: string;
 
@@ -59,6 +60,7 @@ export class TriviaGame {
     public async onLoad(): Promise<void> {
         registerReplaceVariables(this);
         registerEffects(this);
+        registerEventFilters(this);
         this.triviaGameEvents.registerEvents();
     }
 

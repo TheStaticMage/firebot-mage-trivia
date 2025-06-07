@@ -7,7 +7,6 @@ import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
 import { ErrorType, reportError } from './util/errors';
 import { stripTrailingInvisibleCharacters } from './util/text';
-import { TwitchUtil } from './util/twitch';
 
 /**
  * Entry for a user's answer to a question
@@ -247,7 +246,7 @@ export class GameManager {
      * Handle a user's answer to a question
      */
     async handleAnswer(username: string, userDisplayName: string, messageText: string): Promise<boolean> {
-        const answerIndex = await this.validateAnswer(messageText);
+        const answerIndex = this.validateAnswer(messageText);
         if (answerIndex === -1) {
             // We aren't logging this because we could end up effectively
             // logging every single message in chat.
@@ -257,38 +256,6 @@ export class GameManager {
         const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
         const userBalance = await this.triviaGame.getFirebotManager().getUserCurrencyTotal(username);
         let wager = triviaSettings.currencySettings.wager;
-
-        // Follower requirement.
-        if (triviaSettings.gameplaySettings.requireFollowing) {
-            const isFollowing = await new Promise<boolean>((resolve) => {
-                const timeout = setTimeout(() => {
-                    logger('warn', `handleAnswer: Timeout occurred while checking if ${username} is following.`);
-                    resolve(true);
-                }, 1000);
-
-                TwitchUtil.isUserFollowing(username).then((result) => {
-                    clearTimeout(timeout);
-                    resolve(result);
-                }).catch((error) => {
-                    logger('warn', `handleAnswer: Error occurred while checking if ${username} is following: ${error.message}`);
-                    resolve(true);
-                });
-            });
-
-            if (!isFollowing) {
-                logger('debug', `handleAnswer: User ${username} is not following the channel and cannot answer the question.`);
-                const rejection : AnswerRejectedMetadata = {
-                    username: username,
-                    answerIndex: answerIndex,
-                    balance: userBalance,
-                    wager: triviaSettings.currencySettings.wager,
-                    reasonCode: AnswerRejectionReason.NOT_FOLLOWING,
-                    reasonMessage: "You must be following the channel to answer trivia questions"
-                };
-                this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_REJECTED, rejection, false);
-                return false;
-            }
-        }
 
         // We might allow users to change their answer.
         if (this.answerCache.has(username)) {
@@ -389,7 +356,7 @@ export class GameManager {
         return true;
     }
 
-    async validateAnswer(messageText: string): Promise<number> {
+    validateAnswer(messageText: string): number {
         // Chatterino (and maybe others) will add a space and an invisible
         // Unicode character to get around Twitch spam detection. Remove any
         // such characters.

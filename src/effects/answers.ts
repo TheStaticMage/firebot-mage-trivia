@@ -17,7 +17,8 @@ export const answerEffect: Firebot.EffectType<answerInput> = {
         name: TRIVIA_ANSWER_EFFECT_NAME,
         description: "Record the answer to a trivia question.",
         icon: "fad fa-comment-alt",
-        categories: ["scripting"]
+        categories: ["scripting"],
+        dependencies: ["chat"]
     },
     optionsTemplate: "",
     optionsController: () => {},
@@ -58,6 +59,7 @@ export const validateAnswerEffect: Firebot.EffectType<answerInput> = {
         description: "Check if the input is a valid trivia answer for an in-progress game.",
         icon: "fad fa-check-circle",
         categories: ["scripting"],
+        dependencies: ["chat"],
         outputs: [
             {
                 label: "Valid Answer",
@@ -82,7 +84,7 @@ export const validateAnswerEffect: Firebot.EffectType<answerInput> = {
             };
         }
 
-        const answerIndex = await triviaGame.getGameManager().validateAnswer(messageText);
+        const answerIndex = triviaGame.getGameManager().validateAnswer(messageText);
         logger('debug', `Called effect: ${TRIVIA_ANSWER_VALIDATE_EFFECT_NAME} with messageText: "${messageText}" and got result: ${answerIndex !== -1}`);
         return {
             success: true,

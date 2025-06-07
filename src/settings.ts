@@ -20,7 +20,6 @@ export type GameSettings = {
         answerSortOrder: 'Alphabetical' | 'Random';
         timeLimit: number;
         permitAnswerChange: boolean;
-        requireFollowing: boolean;
     };
     otherSettings: {
         confirmationInterval: number;
@@ -350,18 +349,6 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     default: true,
                     sortRank: 3,
                     showBottomHr: true,
-                    validation: {
-                        required: true
-                    }
-                },
-                requireFollowing: {
-                    type: "boolean",
-                    title: "Limit participation to followers",
-                    description: "Whether to require players to be following your channel in order to answer questions.",
-                    tip: "",
-                    default: false,
-                    sortRank: 1,
-                    showBottomHr: false,
                     validation: {
                         required: true
                     }

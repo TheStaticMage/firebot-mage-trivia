@@ -95,10 +95,7 @@ module.exports = {
         "no-empty": ["error", { allowEmptyCatch: true }],
         "no-debugger": "warn",
         "no-extra-boolean-cast": "off",
-        "no-warning-comments": [
-            "warn",
-            { terms: ["todo", "to do", "fix", "fixme", "fix me", "need"], location: "start" }
-        ], // warn about todo comments
+        "no-warning-comments": "off",
 
         // typescript
         "@typescript-eslint/no-unused-vars": "warn",

@@ -22,7 +22,6 @@ export enum AnswerRejectionReason {
     ALREADY_ANSWERED = 'alreadyAnswered',
     INSUFFICIENT_BALANCE = 'insufficientBalance',
     INTERNAL_ERROR = 'internalError',
-    NOT_FOLLOWING = 'notFollowing',
 }
 
 /**
