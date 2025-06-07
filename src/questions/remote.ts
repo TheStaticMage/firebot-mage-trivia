@@ -73,20 +73,20 @@ export class RemoteQuestionManager extends QuestionManager {
                     const question: Question = {
                         questionText: atob(result.question),
                         correctAnswers: Array.isArray(result.correct_answers) ? result.correct_answers : [result.correct_answer],
-                        incorrectAnswers: Array.isArray(result.incorrect_answers) ? result.incorrect_answers : [result.incorrect_answer],
+                        incorrectAnswers: Array.isArray(result.incorrect_answers) ? result.incorrect_answers : [result.incorrect_answer]
                     };
                     // Decode the answers from base64
                     question.correctAnswers = question.correctAnswers.map(answer => atob(answer));
                     question.incorrectAnswers = question.incorrectAnswers.map(answer => atob(answer));
                     return question;
-                } else {
-                    reportError(
-                        ErrorType.CRITICAL_ERROR,
-                        `opentdb.com API response code: ${data?.response_code}`,
-                        'The API returned an unexpected response while fetching the trivia question.'
-                    );
-                    return undefined;
                 }
+                reportError(
+                    ErrorType.CRITICAL_ERROR,
+                    `opentdb.com API response code: ${data?.response_code}`,
+                    'The API returned an unexpected response while fetching the trivia question.'
+                );
+                return undefined;
+
             })
             .catch((error: Error) => {
                 reportError(
@@ -104,7 +104,7 @@ export class RemoteQuestionManager extends QuestionManager {
     private checkSettings(): boolean {
         const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
         if (triviaSettings.triviaDataSettings.enabledCategories.length === 0 || triviaSettings.triviaDataSettings.enabledDifficulties.length === 0 || triviaSettings.triviaDataSettings.enabledTypes.length === 0) {
-             return false;
+            return false;
         }
 
         return true;
@@ -116,7 +116,7 @@ export class RemoteQuestionManager extends QuestionManager {
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
             fetch(url, { signal: controller.signal })
-                .then(response => {
+                .then((response) => {
                     clearTimeout(timeoutId);
                     if (!response.ok) {
                         reject(new Error(`HTTP error! status: ${response.status}`));
@@ -125,7 +125,7 @@ export class RemoteQuestionManager extends QuestionManager {
                     }
                 })
                 .then(data => resolve(data))
-                .catch(error => {
+                .catch((error) => {
                     if (error.name === 'AbortError') {
                         reject(new Error('Request timed out'));
                     } else {

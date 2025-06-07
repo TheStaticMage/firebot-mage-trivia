@@ -60,22 +60,22 @@ const eventSource: EventSource = {
         {
             id: TriviaEvent.GAME_STARTED,
             name: "Question Started",
-            description: "Fires when a question is first asked.",
+            description: "Fires when a question is first asked."
         },
         {
             id: TriviaEvent.GAME_ENDED,
             name: "Question Ended",
-            description: "Fires when a question's answer timer ends. (Does not fire if the question is cancelled.)",
+            description: "Fires when a question's answer timer ends. (Does not fire if the question is cancelled.)"
         },
         {
             id: TriviaEvent.GAME_CANCELLED,
             name: "Question Cancelled",
-            description: "Fires when a question is cancelled.",
+            description: "Fires when a question is cancelled."
         },
         {
             id: TriviaEvent.ANSWER_ACCEPTED,
             name: "Answer Accepted Timer Fired",
-            description: "Fires on a periodic basis while a question is active to acknowledge accepted answers.",
+            description: "Fires on a periodic basis while a question is active to acknowledge accepted answers."
         },
         {
             id: TriviaEvent.ANSWER_REJECTED,
@@ -87,8 +87,8 @@ const eventSource: EventSource = {
                 balance: 100,
                 wager: 50,
                 reasonCode: AnswerRejectionReason.INTERNAL_ERROR,
-                reasonMessage: "Example rejection reason message",
-            },
+                reasonMessage: "Example rejection reason message"
+            }
         },
         {
             id: TriviaEvent.ERROR_CRITICAL,
@@ -96,8 +96,8 @@ const eventSource: EventSource = {
             description: "Fires when a critical error occurs in the trivia game.",
             manualMetadata: {
                 message: "Details of the error are here and may contain sensitive information.",
-                safeMessage: "An error occurred in the trivia game. Please try again later.",
-            },
+                safeMessage: "An error occurred in the trivia game. Please try again later."
+            }
         },
         {
             id: TriviaEvent.ERROR_RUNTIME,
@@ -105,10 +105,10 @@ const eventSource: EventSource = {
             description: "Fires when a normal priority runtime error occurs in the trivia game.",
             manualMetadata: {
                 message: "Details of the error are here and may contain sensitive information.",
-                safeMessage: "A runtime error occurred in the trivia game. Please try again later.",
-            },
+                safeMessage: "A runtime error occurred in the trivia game. Please try again later."
+            }
         }
-    ],
+    ]
 };
 
 /**

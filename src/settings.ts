@@ -46,8 +46,8 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 1,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 wager: {
                     type: "number",
@@ -110,10 +110,10 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 6,
                     showBottomHr: false,
                     validation: {
-                        required: true,
+                        required: true
                     }
-                },
-            },
+                }
+            }
         },
         triviaDataSettings: {
             title: 'Trivia Data Settings',
@@ -126,12 +126,12 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     description: 'Where to get trivia questions from.',
                     tip: 'Select the source of trivia questions.',
                     default: 'API',
-                    options: [ "File", "API" ],
+                    options: ["File", "API"],
                     sortRank: 1,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 triviaFile: {
                     type: "filepath",
@@ -142,8 +142,8 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 2,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 enabledCategories: {
                     type: "multiselect",
@@ -308,8 +308,8 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     validation: {
                         required: true
                     }
-                },
-            },
+                }
+            }
         },
         gameplaySettings: {
             title: 'Gameplay Settings',
@@ -322,12 +322,12 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     description: "How to sort the multiple choice answers.",
                     tip: "",
                     default: 'Random',
-                    options: [ "Alphabetical", "Random" ],
+                    options: ["Alphabetical", "Random"],
                     sortRank: 1,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 timeLimit: {
                     type: "number",
@@ -351,7 +351,7 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 3,
                     showBottomHr: true,
                     validation: {
-                        required: true,
+                        required: true
                     }
                 },
                 requireFollowing: {
@@ -363,10 +363,10 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 1,
                     showBottomHr: false,
                     validation: {
-                        required: true,
+                        required: true
                     }
-                },
-            },
+                }
+            }
         },
         otherSettings: {
             title: 'Advanced Settings',
@@ -398,7 +398,7 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 2,
                     showBottomHr: true,
                     validation: {
-                        required: true,
+                        required: true
                     }
                 },
                 recycleQuestions: {
@@ -410,8 +410,8 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 4,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 enableTriviaErrorFull: {
                     type: "boolean",
@@ -422,10 +422,10 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 5,
                     showBottomHr: true,
                     validation: {
-                        required: true,
+                        required: true
                     }
-                },
-            },
-        },
+                }
+            }
+        }
     };
-};
+}

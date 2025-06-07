@@ -12,10 +12,10 @@ export const mageTriviaError: ReplaceVariable = {
         triggers: {
             "manual": true,
             "event": [
-                TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ERROR_CRITICAL,
-                TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ERROR_RUNTIME,
-            ],
-        },
+                `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ERROR_CRITICAL}`,
+                `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ERROR_RUNTIME}`
+            ]
+        }
     },
     evaluator: async (trigger: Effects.Trigger) => {
         const safeMessage = trigger.metadata.eventData?.safeMessage as string;
@@ -25,7 +25,7 @@ export const mageTriviaError: ReplaceVariable = {
         }
         logger('debug', `mageTriviaError: ${safeMessage}`);
         return safeMessage;
-    },
+    }
 };
 
 export const mageTriviaErrorFull: ReplaceVariable = {
@@ -36,10 +36,10 @@ export const mageTriviaErrorFull: ReplaceVariable = {
         triggers: {
             "manual": true,
             "event": [
-                TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ERROR_CRITICAL,
-                TRIVIA_EVENT_SOURCE_ID + ":" + TriviaEvent.ERROR_RUNTIME,
-            ],
-        },
+                `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ERROR_CRITICAL}`,
+                `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ERROR_RUNTIME}`
+            ]
+        }
     },
     evaluator: async (trigger: Effects.Trigger) => {
         const safeMessage = trigger.metadata.eventData?.safeMessage as string;
@@ -63,5 +63,5 @@ export const mageTriviaErrorFull: ReplaceVariable = {
 
         logger('debug', `mageTriviaErrorFullDONOTUSETHISINCHAT: ${safeMessage} ${fullMessage}`);
         return `${safeMessage} ${fullMessage}`;
-    },
+    }
 };

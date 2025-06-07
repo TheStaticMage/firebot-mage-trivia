@@ -21,14 +21,14 @@ export class TriviaGameEffects {
      * Creates the effect for submitting a trivia answer
      * @returns The effect definition
      */
-    private AnswerEffect(): Firebot.EffectType<{}> {
+    private answerEffect(): Firebot.EffectType<object> {
         return {
             definition: {
                 id: TRIVIA_ANSWER_EFFECT_ID,
                 name: TRIVIA_ANSWER_EFFECT_NAME,
                 description: "Record the answer to a trivia question.",
                 icon: "fad fa-comment-alt",
-                categories: ["scripting"],
+                categories: ["scripting"]
             },
             optionsTemplate: "",
             optionsController: () => {},
@@ -37,8 +37,8 @@ export class TriviaGameEffects {
             },
             onTriggerEvent: async (event) => {
                 return await this.answerOnTrigger(event.trigger);
-            },
-        }
+            }
+        };
     }
 
     /**
@@ -75,14 +75,14 @@ export class TriviaGameEffects {
      * Creates the effect for canceling a trivia game
      * @returns The effect definition
      */
-    private CancelGameEffect(): Firebot.EffectType<{}> {
+    private cancelGameEffect(): Firebot.EffectType<object> {
         return {
             definition: {
                 id: TRIVIA_CANCEL_QUESTION_EFFECT_ID,
                 name: TRIVIA_CANCEL_QUESTION_EFFECT_NAME,
                 description: "Cancel the current trivia question.",
                 icon: "fad fa-ban",
-                categories: ["scripting"],
+                categories: ["scripting"]
             },
             optionsTemplate: "",
             optionsController: () => {},
@@ -92,22 +92,22 @@ export class TriviaGameEffects {
             onTriggerEvent: async (event) => {
                 logger('debug', `Called effect: ${TRIVIA_CANCEL_QUESTION_EFFECT_NAME}`);
                 await this.triviaGame.getGameManager().cancelGame(event.trigger);
-            },
-        }
+            }
+        };
     }
 
     /**
      * Creates trivia game
      * @returns The effect definition
      */
-    private CreateGameEffect(): Firebot.EffectType<{}> {
+    private createGameEffect(): Firebot.EffectType<object> {
         return {
             definition: {
                 id: TRIVIA_CREATE_QUESTION_EFFECT_ID,
                 name: TRIVIA_CREATE_QUESTION_EFFECT_NAME,
                 description: "Start a trivia question.",
                 icon: "fad fa-question-circle",
-                categories: ["scripting"],
+                categories: ["scripting"]
             },
             optionsTemplate: "",
             optionsController: () => {},
@@ -117,8 +117,8 @@ export class TriviaGameEffects {
             onTriggerEvent: async (event) => {
                 logger('debug', `Called effect: ${TRIVIA_CREATE_QUESTION_EFFECT_NAME}`);
                 await this.triviaGame.getGameManager().createGame(event.trigger);
-            },
-        }
+            }
+        };
     }
 
     /**
@@ -126,9 +126,9 @@ export class TriviaGameEffects {
      */
     public registerEffects(): void {
         try {
-            this.triviaGame.getFirebotManager().registerEffect(this.AnswerEffect());
-            this.triviaGame.getFirebotManager().registerEffect(this.CancelGameEffect());
-            this.triviaGame.getFirebotManager().registerEffect(this.CreateGameEffect());
+            this.triviaGame.getFirebotManager().registerEffect(this.answerEffect());
+            this.triviaGame.getFirebotManager().registerEffect(this.cancelGameEffect());
+            this.triviaGame.getFirebotManager().registerEffect(this.createGameEffect());
             logger('info', "Trivia effects successfully registered");
         } catch (error) {
             logger('error', `Failed to register effects: ${error}`);

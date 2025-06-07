@@ -14,15 +14,14 @@ export function reportError(errorType: ErrorType, fullErrorMessage: string, safe
     const metadata: ErrorMetadata = {
         safeMessage: safeErrorMessage,
         message: fullErrorMessage,
-        trigger: trigger,
+        trigger: trigger
     };
     logger('debug', `Reporting error: ${loggedMessage} with metadata: ${JSON.stringify(metadata)}`);
 
     if (errorType === ErrorType.CRITICAL_ERROR) {
         logger('error', `Critical error occurred: ${loggedMessage}`);
         triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ERROR_CRITICAL, metadata, false);
-    }
-    else if (errorType === ErrorType.RUNTIME_ERROR) {
+    } else if (errorType === ErrorType.RUNTIME_ERROR) {
         logger('warn', `Runtime error occurred: ${loggedMessage}`);
         triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ERROR_RUNTIME, metadata, false);
     }
