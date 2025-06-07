@@ -44,6 +44,15 @@ export type AnswerRejectedMetadata = {
     reasonMessage: string;
 }
 
+/**
+ * Metadata for a critical error or runtime error (TRIVIA_ERROR_CRITICAL_EVENT or TRIVIA_ERROR_RUNTIME_EVENT)
+ */
+export type ErrorMetadata = {
+    message: string;
+    safeMessage: string; // A sanitized version of the error message that can be safely displayed in chat
+    trigger?: any; // Optional trigger data if the error was triggered by a specific event
+}
+
 const eventSource: EventSource = {
     id: TRIVIA_EVENT_SOURCE_ID,
     name: TRIVIA_EVENT_SOURCE_NAME,
@@ -86,7 +95,8 @@ const eventSource: EventSource = {
             name: "Critical Error",
             description: "Fires when a critical error occurs in the trivia game.",
             manualMetadata: {
-                message: "Example critical error message",
+                message: "Details of the error are here and may contain sensitive information.",
+                safeMessage: "An error occurred in the trivia game. Please try again later.",
             },
         },
         {
@@ -94,7 +104,8 @@ const eventSource: EventSource = {
             name: "Runtime Error",
             description: "Fires when a normal priority runtime error occurs in the trivia game.",
             manualMetadata: {
-                message: "Example runtime error message",
+                message: "Details of the error are here and may contain sensitive information.",
+                safeMessage: "A runtime error occurred in the trivia game. Please try again later.",
             },
         }
     ],

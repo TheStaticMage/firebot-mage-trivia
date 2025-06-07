@@ -90,18 +90,10 @@ export class TriviaGameEffects {
                 return [];
             },
             onTriggerEvent: async (event) => {
-                return await this.cancelGameOnTrigger(event.trigger);
+                logger('debug', `Called effect: ${TRIVIA_CANCEL_QUESTION_EFFECT_NAME}`);
+                await this.triviaGame.getGameManager().cancelGame(event.trigger);
             },
         }
-    }
-
-    /**
-     * Handles the cancellation of a game through an effect trigger
-     * @param trigger - The effect trigger event
-     */
-    private async cancelGameOnTrigger(trigger: Effects.Trigger): Promise<void> {
-        logger('debug', `Called effect: ${TRIVIA_CANCEL_QUESTION_EFFECT_NAME}`);
-        await this.triviaGame.getGameManager().cancelGame(trigger);
     }
 
     /**
@@ -123,18 +115,10 @@ export class TriviaGameEffects {
                 return [];
             },
             onTriggerEvent: async (event) => {
-                return await this.createGameOnTrigger(event.trigger);
+                logger('debug', `Called effect: ${TRIVIA_CREATE_QUESTION_EFFECT_NAME}`);
+                await this.triviaGame.getGameManager().createGame(event.trigger);
             },
         }
-    }
-
-    /**
-     * Handles the creation of a game through an effect trigger
-     * @param trigger - The effect trigger event
-     */
-    private async createGameOnTrigger(trigger: Effects.Trigger): Promise<void> {
-        logger('debug', `Called effect: ${TRIVIA_CREATE_QUESTION_EFFECT_NAME}`);
-        await this.triviaGame.getGameManager().createGame(trigger);
     }
 
     /**

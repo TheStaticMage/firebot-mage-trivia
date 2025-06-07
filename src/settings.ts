@@ -26,6 +26,7 @@ export type GameSettings = {
         confirmationInterval: number;
         persistAskedQuestionsToFile: boolean;
         recycleQuestions: boolean;
+        enableTriviaErrorFull: boolean;
     };
 };
 
@@ -411,6 +412,18 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     validation: {
                         required: true,
                     },
+                },
+                enableTriviaErrorFull: {
+                    type: "boolean",
+                    title: "Enable the $mageTriviaErrorFullDONOTUSETHISINCHAT variable",
+                    description: "We're just making sure you understand the implications of using this variable.",
+                    tip: "This variable can contain sensitive information, which could dox you if you use it in a chat message. Tread carefully.",
+                    default: false,
+                    sortRank: 5,
+                    showBottomHr: true,
+                    validation: {
+                        required: true,
+                    }
                 },
             },
         },

@@ -86,7 +86,12 @@ export class GameManager {
      */
     async cancelGame(trigger: Effects.Trigger): Promise<void> {
         if (!this.isGameActive()) {
-            reportError(ErrorType.RUNTIME_ERROR, 'cancelGame() was called while trivia is not active.', trigger);
+            reportError(
+                ErrorType.RUNTIME_ERROR,
+                '',
+                'Cancel Trivia Question was called while there was not an active trivia game.',
+                trigger,
+            );
             return;
         }
 
@@ -116,7 +121,12 @@ export class GameManager {
 
         // Make sure there isn't a game in progress already.
         if (this.isGameActive()) {
-            reportError(ErrorType.RUNTIME_ERROR, 'createGame() was called while trivia is active.', trigger);
+            reportError(
+                ErrorType.RUNTIME_ERROR,
+                '',
+                'Create Trivia Question effect was called while there was already an active trivia question.',
+                trigger,
+            );
             return;
         }
 
@@ -126,7 +136,12 @@ export class GameManager {
         // Get the question.
         const question = await this.triviaGame.getQuestionManager().getNewQuestion();
         if (!question) {
-            reportError(ErrorType.RUNTIME_ERROR, 'createGame() could not get a question.', trigger);
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                '',
+                'Could not get a question to create trivia game.',
+                trigger,
+            );
             return;
         }
 
@@ -163,7 +178,7 @@ export class GameManager {
     async endGame(trigger: Effects.Trigger): Promise<void> {
         // Make sure there's actually a question in progress.
         if (!this.isGameActive()) {
-            reportError(ErrorType.RUNTIME_ERROR, 'endGame event was called while trivia is not active.', trigger);
+            logger('warn', `endGame: function was called while trivia is not active.`);
             this.clearTemporaryState();
             return;
         }
