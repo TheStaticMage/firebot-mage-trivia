@@ -8,7 +8,7 @@ export const isTriviaAnswerFilter: EventFilter = {
     events: [
         { eventSourceId: "twitch", eventId: "chat-message" }
     ],
-    comparisonTypes: ["is", "is not"], // TODO expose these in custom-script-types
+    comparisonTypes: ["is"], // TODO expose these in custom-script-types
     valueType: "preset",
     presetValues(): PresetValue[] {
         return [
