@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-warning-comments
 // TODO: Refactor this file to use the new variable organization.
 // PLEASE DO NOT ADD ANY NEW VARIABLES HERE.
 
