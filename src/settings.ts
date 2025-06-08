@@ -20,12 +20,12 @@ export type GameSettings = {
         answerSortOrder: 'Alphabetical' | 'Random';
         timeLimit: number;
         permitAnswerChange: boolean;
-        requireFollowing: boolean;
     };
     otherSettings: {
         confirmationInterval: number;
         persistAskedQuestionsToFile: boolean;
         recycleQuestions: boolean;
+        enableTriviaErrorFull: boolean;
     };
 };
 
@@ -45,12 +45,12 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 1,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 wager: {
                     type: "number",
-                    title: "Incorrect Answer Wager",
+                    title: "Incorrect Answer Penalty",
                     description: "The amount of currency to subtract for a wrong answer to a question.",
                     tip: "",
                     default: 10,
@@ -90,7 +90,7 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                 timeBonusDecay: {
                     type: "number",
                     title: "Time Bonus Decay Factor",
-                    description: "The exponent in the decay function. 0 = no decay, 1 = linear decay, etc.",
+                    description: "Higher numbers more disproportionately reward faster answers.",
                     tip: "Values between 1 and 3 are recommended.",
                     default: 1,
                     sortRank: 5,
@@ -103,16 +103,16 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                 allowInsufficientBalance: {
                     type: "boolean",
                     title: "Allow Insufficient Balance",
-                    description: "Whether to allow viewers to answer questions even if they don't have enough currency.",
-                    tip: "Check the box to let players answer even if they don't have enough currency.",
+                    description: "Whether to allow viewers to answer questions even if they don't have enough currency to cover an incorrect answer.",
+                    tip: "Check the box to let players answer even if they don't have enough currency to cover an incorrect answer.",
                     default: false,
                     sortRank: 6,
                     showBottomHr: false,
                     validation: {
-                        required: true,
+                        required: true
                     }
-                },
-            },
+                }
+            }
         },
         triviaDataSettings: {
             title: 'Trivia Data Settings',
@@ -125,12 +125,12 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     description: 'Where to get trivia questions from.',
                     tip: 'Select the source of trivia questions.',
                     default: 'API',
-                    options: [ "File", "API" ],
+                    options: ["File", "API"],
                     sortRank: 1,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 triviaFile: {
                     type: "filepath",
@@ -141,8 +141,8 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 2,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 enabledCategories: {
                     type: "multiselect",
@@ -307,8 +307,8 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     validation: {
                         required: true
                     }
-                },
-            },
+                }
+            }
         },
         gameplaySettings: {
             title: 'Gameplay Settings',
@@ -321,12 +321,12 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     description: "How to sort the multiple choice answers.",
                     tip: "",
                     default: 'Random',
-                    options: [ "Alphabetical", "Random" ],
+                    options: ["Alphabetical", "Random"],
                     sortRank: 1,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
                 timeLimit: {
                     type: "number",
@@ -350,22 +350,10 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 3,
                     showBottomHr: true,
                     validation: {
-                        required: true,
+                        required: true
                     }
-                },
-                requireFollowing: {
-                    type: "boolean",
-                    title: "Limit participation to followers",
-                    description: "Whether to require players to be following your channel in order to answer questions.",
-                    tip: "",
-                    default: false,
-                    sortRank: 1,
-                    showBottomHr: false,
-                    validation: {
-                        required: true,
-                    }
-                },
-            },
+                }
+            }
         },
         otherSettings: {
             title: 'Advanced Settings',
@@ -397,7 +385,7 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 2,
                     showBottomHr: true,
                     validation: {
-                        required: true,
+                        required: true
                     }
                 },
                 recycleQuestions: {
@@ -409,10 +397,22 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     sortRank: 4,
                     showBottomHr: true,
                     validation: {
-                        required: true,
-                    },
+                        required: true
+                    }
                 },
-            },
-        },
+                enableTriviaErrorFull: {
+                    type: "boolean",
+                    title: "Enable the $mageTriviaErrorFullDONOTUSETHISINCHAT variable",
+                    description: "We're just making sure you understand the implications of using this variable.",
+                    tip: "This variable can contain sensitive information, which could dox you if you use it in a chat message. Tread carefully.",
+                    default: false,
+                    sortRank: 5,
+                    showBottomHr: true,
+                    validation: {
+                        required: true
+                    }
+                }
+            }
+        }
     };
-};
+}

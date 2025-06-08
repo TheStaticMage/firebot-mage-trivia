@@ -34,10 +34,10 @@ export function joinWithAnd(items: string[]): string {
         return items[0];
     } else if (items.length === 2) {
         return `${items[0]} and ${items[1]}`;
-    } else {
-        const lastItem = items.pop();
-        return `${items.join(', ')}, and ${lastItem}`;
     }
+    const lastItem = items.pop();
+    return `${items.join(', ')}, and ${lastItem}`;
+
 }
 
 /**
@@ -52,10 +52,10 @@ export function joinWithOr(items: string[]): string {
         return items[0];
     } else if (items.length === 2) {
         return `${items[0]} or ${items[1]}`;
-    } else {
-        const lastItem = items.pop();
-        return `${items.join(', ')}, or ${lastItem}`;
     }
+    const lastItem = items.pop();
+    return `${items.join(', ')}, or ${lastItem}`;
+
 }
 
 /**
@@ -74,12 +74,12 @@ export function stripTrailingInvisibleCharacters(str: string): string {
         '\u2060', // Word joiner
         '\u180E', // Mongolian vowel separator
         '\u061C', // Arabic letter mark
-        '\uDB40', // High surrogate
+        '\uDB40' // High surrogate
     ];
 
     // Check if string ends with space + invisible character
     for (const char of invisibleChars) {
-        if (str.endsWith(' ' + char)) {
+        if (str.endsWith(` ${char}`)) {
             return str.slice(0, -2);
         }
     }

@@ -74,7 +74,7 @@ export class LocalQuestionManager extends QuestionManager {
                 logger('warn', `Reloaded questions from file; there are now ${questionKeys.length} questions in the database.`);
             }
 
-            let answeredQuestions = this.usedQuestionsCache.keys();
+            const answeredQuestions = this.usedQuestionsCache.keys();
             logger('debug', `There are ${answeredQuestions.length} questions that have been answered.`);
 
             let unansweredQuestions = this.getUnansweredQuestions();
@@ -90,7 +90,11 @@ export class LocalQuestionManager extends QuestionManager {
             }
 
             if (unansweredQuestions.length === 0) {
-                reportError(ErrorType.RUNTIME_ERROR, 'No unanswered questions available to ask.', undefined);
+                reportError(
+                    ErrorType.CRITICAL_ERROR,
+                    '',
+                    'No questions are available to ask. You either need to add more questions to the trivia file or enable the "Recycle Questions" setting.'
+                );
                 return;
             }
 
@@ -112,7 +116,11 @@ export class LocalQuestionManager extends QuestionManager {
         try {
             fileContents = fs.readFileSync(filePath, 'utf8');
         } catch (error) {
-            reportError(ErrorType.CRITICAL_ERROR, `Error reading trivia file: ${filePath}: ${error}`, undefined);
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                `${filePath}: ${error}`,
+                "Error reading trivia file. Please check the file path and ensure it exists."
+            );
             return;
         }
 
@@ -120,22 +128,30 @@ export class LocalQuestionManager extends QuestionManager {
         try {
             questions = yaml.load(fileContents) as yamlQuestionType[];
         } catch (error) {
-            reportError(ErrorType.CRITICAL_ERROR, `Error loading YAML file ${filePath}: ${error}`, undefined);
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                `${error}`,
+                "Error parsing trivia file. Please check that the file is in the correct format."
+            );
             return;
         }
 
-        let file: string = path.basename(filePath, path.extname(filePath));
+        const file: string = path.basename(filePath, path.extname(filePath));
         const questionMap: Map<string, Question> = new Map();
 
-        questions.forEach((question, index) => {
+        questions.forEach((question) => {
             const formattedQuestion: Question = {
                 questionText: question.questionText,
                 correctAnswers: question.answers.filter((answer: any) => answer.isCorrect).map((answer: any) => String(answer.answerText)),
-                incorrectAnswers: question.answers.filter((answer: any) => !answer.isCorrect).map((answer: any) => String(answer.answerText)),
+                incorrectAnswers: question.answers.filter((answer: any) => !answer.isCorrect).map((answer: any) => String(answer.answerText))
             };
 
             if (formattedQuestion.correctAnswers.length === 0) {
-                reportError(ErrorType.RUNTIME_ERROR, `Question in file ${file} at index ${index} has no correct answers: ${formattedQuestion.questionText}`, undefined);
+                reportError(
+                    ErrorType.RUNTIME_ERROR,
+                    "",
+                    `A question in the trivia file has no correct answers. (${formattedQuestion.questionText}).`
+                );
                 return;
             }
 
@@ -216,7 +232,11 @@ export class LocalQuestionManager extends QuestionManager {
                 fs.writeFileSync(usedQuestionsFilePath, JSON.stringify(usedQuestions, null, 2));
                 logger('debug', `Saved ${usedQuestions.length} used questions to ${usedQuestionsFilePath}.`);
             } catch (error) {
-                reportError(ErrorType.CRITICAL_ERROR, `Error saving used questions file: ${usedQuestionsFilePath}: ${error}`, undefined);
+                reportError(
+                    ErrorType.CRITICAL_ERROR,
+                    `Error saving used questions file: ${usedQuestionsFilePath}: ${error}`,
+                    'An error occurred while saving the used questions file.'
+                );
             }
         });
     }

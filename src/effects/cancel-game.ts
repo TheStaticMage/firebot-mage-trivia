@@ -1,0 +1,27 @@
+import { Firebot } from '@crowbartools/firebot-custom-scripts-types';
+import { logger } from '../firebot';
+import { triviaGame } from '../globals';
+
+const TRIVIA_CANCEL_QUESTION_EFFECT_ID = "magetrivia:trivia:cancelQuestion";
+const TRIVIA_CANCEL_QUESTION_EFFECT_NAME = "[Mage Trivia] Cancel Trivia Question";
+
+type cancelGameInput = Record<string, never>
+
+export const cancelGameEffect: Firebot.EffectType<cancelGameInput> = {
+    definition: {
+        id: TRIVIA_CANCEL_QUESTION_EFFECT_ID,
+        name: TRIVIA_CANCEL_QUESTION_EFFECT_NAME,
+        description: "Cancel the current trivia question.",
+        icon: "fad fa-ban",
+        categories: ["scripting"]
+    },
+    optionsTemplate: "",
+    optionsController: () => {},
+    optionsValidator: () => {
+        return [];
+    },
+    onTriggerEvent: async (event) => {
+        logger('debug', `Called effect: ${TRIVIA_CANCEL_QUESTION_EFFECT_NAME}`);
+        await triviaGame.getGameManager().cancelGame(event.trigger);
+    }
+};
