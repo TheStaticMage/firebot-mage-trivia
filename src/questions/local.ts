@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as NodeCache from 'node-cache';
 import * as path from 'path';
-import { logger } from '../firebot';
+import { logger } from '../logger';
 import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
 import { Question, QuestionManager } from './common';

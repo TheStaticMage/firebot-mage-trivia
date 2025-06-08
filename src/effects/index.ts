@@ -1,4 +1,4 @@
-import { logger } from '../firebot';
+import { logger } from '../logger';
 import { TriviaGame } from '../globals';
 import { answerEffect } from './answers';
 import { cancelGameEffect } from './cancel-game';

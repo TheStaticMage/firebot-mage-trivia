@@ -1,8 +1,6 @@
 import { answerLabels } from '../constants';
 import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
-import { LocalQuestionManager } from './local';
-import { RemoteQuestionManager } from './remote';
 
 export interface Question {
     questionText: string;
@@ -16,16 +14,7 @@ export interface askedQuestion {
     correctAnswers: number[];
 }
 
-export function getQuestionManager(triviaGame: TriviaGame): QuestionManager {
-    const triviaSettings = triviaGame.getFirebotManager().getGameSettings();
-    if (triviaSettings.triviaDataSettings.triviaSource === 'File') {
-        return new LocalQuestionManager(triviaGame);
-    } else {
-        return new RemoteQuestionManager(triviaGame);
-    }
-}
-
-export class QuestionManager {
+export abstract class QuestionManager {
     protected triviaGame: TriviaGame;
 
     constructor(triviaGame: TriviaGame) {

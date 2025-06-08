@@ -1,5 +1,5 @@
 import { Firebot } from '@crowbartools/firebot-custom-scripts-types';
-import { logger } from '../firebot';
+import { logger } from '../logger';
 import { triviaGame } from '../globals';
 
 const TRIVIA_CREATE_QUESTION_EFFECT_ID = "magetrivia:trivia:createQuestion";

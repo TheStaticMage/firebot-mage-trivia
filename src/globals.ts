@@ -2,9 +2,12 @@ import { registerConditions } from './conditions';
 import { registerEffects } from './effects';
 import { TriviaGameEvents } from './events';
 import { registerEventFilters } from './filters';
-import { FirebotManager, logger } from './firebot';
+import { FirebotManager } from './firebot';
 import { GameManager } from './game';
-import { getQuestionManager, QuestionManager } from './questions/common';
+import { logger } from './logger';
+import { QuestionManager } from './questions/common';
+import { LocalQuestionManager } from './questions/local';
+import { RemoteQuestionManager } from './questions/remote';
 import { registerReplaceVariables } from './variables';
 
 declare const SCRIPTS_DIR: string;
@@ -16,14 +19,13 @@ const usedQuestionsPath = 'firebot-mage-trivia-data/used-questions.json';
 export class TriviaGame {
     private gameManager: GameManager;
     private firebotManager: FirebotManager;
-    private questionManager: QuestionManager;
+    private questionManager!: QuestionManager;
     private triviaGameEvents: TriviaGameEvents;
 
     constructor(firebotManager: FirebotManager) {
         this.firebotManager = firebotManager;
         this.gameManager = new GameManager(this);
         this.triviaGameEvents = new TriviaGameEvents(this);
-        this.questionManager = getQuestionManager(this);
     }
 
     public getGameManager(): GameManager {
@@ -63,6 +65,7 @@ export class TriviaGame {
         registerEventFilters(this);
         this.triviaGameEvents.registerEvents();
         registerReplaceVariables(this);
+        this.initQuestionManager();
     }
 
     public onUnload(): void {
@@ -70,12 +73,21 @@ export class TriviaGame {
     }
 
     public onSettingsUpdate(): void {
-        this.questionManager = getQuestionManager(this);
+        this.questionManager = this.initQuestionManager();
         this.getQuestionManager().initializeQuestions();
     }
 
     public initializeQuestionManager(): void {
         // Initialize the question manager.
         this.questionManager.initializeQuestions();
+    }
+
+    private initQuestionManager(): QuestionManager {
+        const triviaSettings = this.firebotManager.getGameSettings();
+        if (triviaSettings.triviaDataSettings.triviaSource === 'File') {
+            return new LocalQuestionManager(this);
+        } else {
+            return new RemoteQuestionManager(this);
+        }
     }
 }

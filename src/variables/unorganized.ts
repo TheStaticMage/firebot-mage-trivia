@@ -4,7 +4,7 @@
 
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
 import { answerLabels } from '../constants';
-import { logger } from '../firebot';
+import { logger } from '../logger';
 import { TriviaGame, triviaGame } from '../globals';
 import { askedQuestion } from '../questions/common';
 

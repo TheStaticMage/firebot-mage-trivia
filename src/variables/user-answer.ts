@@ -1,7 +1,7 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
-import { AnswerRejectedMetadata, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
-import { logger } from '../firebot';
+import { TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
+import { logger } from '../logger';
 
 export const mageTriviaAnswerAccepted: ReplaceVariable = {
     definition: {
@@ -35,9 +35,8 @@ export const mageTriviaAnswerRejected: ReplaceVariable = {
         }
     },
     evaluator: (trigger: Effects.Trigger) => {
-        const metadata = trigger.metadata as unknown as AnswerRejectedMetadata;
-        logger('debug', `mageTriviaAnswerRejected: ${metadata.reasonMessage}`);
-        return metadata.reasonMessage;
+        const metadata = trigger.metadata;
+        return metadata.eventData?.reasonMessage;
     }
 };
 
@@ -52,8 +51,7 @@ export const mageTriviaAnswerRejectedRaw: ReplaceVariable = {
         }
     },
     evaluator: (trigger: Effects.Trigger) => {
-        const metadata = trigger.metadata as unknown as AnswerRejectedMetadata;
-        logger('debug', `mageTriviaAnswerRejectedRaw: ${JSON.stringify(metadata)}`);
+        const metadata = trigger.metadata;
         return metadata;
     }
 };

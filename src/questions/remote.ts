@@ -1,4 +1,4 @@
-import { logger } from '../firebot';
+import { logger } from '../logger';
 import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
 import { Question, QuestionManager } from './common';

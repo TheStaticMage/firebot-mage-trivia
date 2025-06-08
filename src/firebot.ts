@@ -8,7 +8,6 @@ import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/type
 import { TwitchApi } from '@crowbartools/firebot-custom-scripts-types/types/modules/twitch-api';
 import { UserDb } from '@crowbartools/firebot-custom-scripts-types/types/modules/user-db';
 import { TRIVIA_GAME_ABBR, TRIVIA_GAME_ID } from './constants';
-import { triviaGame } from './globals';
 import { GameSettings } from './settings';
 
 export class FirebotManager {
@@ -138,8 +137,4 @@ export class FirebotManager {
     public getModules(): ScriptModules {
         return this.firebot.modules;
     }
-}
-
-export function logger(type: string, message: string): void {
-    triviaGame.getFirebotManager().logger(type, message);
 }

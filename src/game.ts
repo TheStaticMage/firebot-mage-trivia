@@ -2,7 +2,7 @@ import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effect
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
 import { AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
-import { logger } from './firebot';
+import { logger } from './logger';
 import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
 import { ErrorType, reportError } from './util/errors';

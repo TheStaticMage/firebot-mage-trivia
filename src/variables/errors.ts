@@ -1,7 +1,7 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
 import { TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
-import { logger } from '../firebot';
+import { logger } from '../logger';
 import { triviaGame } from '../globals';
 
 export const mageTriviaError: ReplaceVariable = {

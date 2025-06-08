@@ -1,5 +1,5 @@
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
-import { logger } from '../firebot';
+import { logger } from '../logger';
 import { triviaGame } from '../globals';
 
 
