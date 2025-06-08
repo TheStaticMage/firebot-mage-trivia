@@ -1,1 +1,6 @@
 blank_issues_enabled: true
+contact_links:
+  - name: The Static Mage
+    url: https://github.com/TheStaticMage/firebot-mage-trivia/issues
+    about: Please report bugs and request features here.
+
