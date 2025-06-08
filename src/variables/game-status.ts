@@ -10,7 +10,7 @@ export const mageTriviaGameInProgress: ReplaceVariable = {
         possibleDataOutput: ["bool"]
     },
     evaluator: async () => {
-        const data = triviaGame.getGameManager().isGameActive();
+        const data = triviaGame.getGameManager().isGameInProgress();
         logger("debug", `mageTriviaGameInProgress: ${data}`);
         return data;
     }

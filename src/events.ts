@@ -74,7 +74,7 @@ const eventSource: EventSource = {
         {
             id: TriviaEvent.ANSWER_ACCEPTED,
             name: "Answer Accepted Timer Fired",
-            description: "Fires on a periodic basis while a question is active to acknowledge accepted answers."
+            description: "Fires on a periodic basis while a question is in progress to acknowledge accepted answers."
         },
         {
             id: TriviaEvent.ANSWER_REJECTED,

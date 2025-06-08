@@ -1,10 +1,10 @@
 import { ConditionType, PresetValue } from "@crowbartools/firebot-custom-scripts-types/types/modules/condition-manager";
 import { triviaGame } from "../globals";
 
-export const isTriviaGameActiveCondition: ConditionType<any, any, any> = {
-    id: "magetrivia:trivia:isGameActiveCondition",
-    name: "[Mage Trivia] Is Game Active",
-    description: "Checks if a trivia game is currently active.",
+export const mageTriviaGameInProgress: ConditionType<any, any, any> = {
+    id: "magetrivia:trivia:gameInProgressCondition",
+    name: "[Mage Trivia] Game In Progress",
+    description: "Checks if a trivia game is currently in progress.",
     comparisonTypes: ["is"],
     rightSideValueType: "preset",
     leftSideValueType: "none",
@@ -15,6 +15,6 @@ export const isTriviaGameActiveCondition: ConditionType<any, any, any> = {
         ];
     },
     predicate(): boolean {
-        return triviaGame.getGameManager().isGameActive();
+        return triviaGame.getGameManager().isGameInProgress();
     }
 };

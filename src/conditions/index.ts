@@ -1,9 +1,9 @@
 import { TriviaGame } from '../globals';
-import { isTriviaGameActiveCondition } from './game-active';
+import { mageTriviaGameInProgress } from './game-in-progress';
 
 /**
  * Registers all conditions for the trivia game
  */
 export function registerConditions(triviaGame: TriviaGame): void {
-    triviaGame.getFirebotManager().registerConditionType(isTriviaGameActiveCondition);
+    triviaGame.getFirebotManager().registerConditionType(mageTriviaGameInProgress);
 }

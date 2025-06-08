@@ -25,7 +25,7 @@ type AnswerEntry = {
  */
 export type GameState = {
     askedQuestion: askedQuestion; // The asked question object containing the question and answers
-    active: boolean; // Indicates if the game is active
+    inProgress: boolean; // Indicates if the game is in progress
     complete: boolean; // Indicates if the game is complete
     losers: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of users who answered incorrectly
     winners: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of winners with their points
@@ -74,10 +74,10 @@ export class GameManager {
 
     /**
      * Get the time remaining in the current question
-     * @returns The time remaining in seconds, or -1 if no question is active
+     * @returns The time remaining in seconds, or -1 if no question is in progress
      */
     getTimeRemaining(): number {
-        if (!this.isGameActive()) {
+        if (!this.isGameInProgress()) {
             return -1;
         }
 
@@ -89,10 +89,10 @@ export class GameManager {
     }
 
     /**
-     * Check if a game is active
+     * Check if a game is in progress
      */
-    isGameActive(): boolean {
-        return this.gameState && this.gameState.active;
+    isGameInProgress(): boolean {
+        return this.gameState && this.gameState.inProgress;
     }
 
     /**
@@ -100,11 +100,11 @@ export class GameManager {
      * @param trigger - The effect trigger event
      */
     async cancelGame(trigger: Effects.Trigger): Promise<void> {
-        if (!this.isGameActive()) {
+        if (!this.isGameInProgress()) {
             reportError(
                 ErrorType.RUNTIME_ERROR,
                 '',
-                'Cancel Trivia Question was called while there was not an active trivia game.',
+                'Cancel Trivia Question was called while there was no trivia game in progress.',
                 trigger
             );
             return;
@@ -135,11 +135,11 @@ export class GameManager {
         const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
 
         // Make sure there isn't a game in progress already.
-        if (this.isGameActive()) {
+        if (this.isGameInProgress()) {
             reportError(
                 ErrorType.RUNTIME_ERROR,
                 '',
-                'Create Trivia Question effect was called while there was already an active trivia question.',
+                'Create Trivia Question effect was called while there was already a trivia question in progress.',
                 trigger
             );
             return;
@@ -167,7 +167,7 @@ export class GameManager {
         this.initGameState();
         this.gameState.askedQuestion = preparedQuestion;
         this.gameState.questionStart = Date.now();
-        this.gameState.active = true;
+        this.gameState.inProgress = true;
 
         // Start the locked-in notification timer.
         const self = this;
@@ -192,8 +192,8 @@ export class GameManager {
      */
     async endGame(): Promise<void> {
         // Make sure there's actually a question in progress.
-        if (!this.isGameActive()) {
-            logger('warn', `endGame: function was called while trivia is not active.`);
+        if (!this.isGameInProgress()) {
+            logger('warn', `endGame: function was called while trivia is not in progress.`);
             this.clearTemporaryState();
             return;
         }
@@ -248,7 +248,7 @@ export class GameManager {
             });
 
         this.gameState.complete = true;
-        this.gameState.active = false;
+        this.gameState.inProgress = false;
 
         this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.GAME_ENDED, {}, false);
 
@@ -385,9 +385,9 @@ export class GameManager {
             return -1;
         }
 
-        // Check if a game is active and ignore any answers outside of the game.
-        if (!this.isGameActive()) {
-            logger('debug', `validateAnswer: Discarding possible trivia answer received while no question is active.`);
+        // Check if a game is in progress and ignore any answers outside of the game.
+        if (!this.isGameInProgress()) {
+            logger('debug', `validateAnswer: Discarding possible trivia answer received while no question is in progress.`);
             return -1;
         }
 
@@ -464,7 +464,7 @@ export class GameManager {
     private initGameState(): void {
         this.gameState = {
             askedQuestion: undefined,
-            active: false,
+            inProgress: false,
             complete: false,
             losers: [],
             winners: [],
