@@ -1,6 +1,5 @@
 name: Bug Report
 description: Bug Report
-type: "Bug"
 body:
   - type: textarea
     attributes:
