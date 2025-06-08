@@ -73,8 +73,8 @@ export class GameManager {
     }
 
     /**
-     * Get the time remaining in the current question
-     * @returns The time remaining in seconds, or -1 if no question is in progress
+     * Get the time remaining in the current game
+     * @returns The time remaining in seconds, or -1 if no game is in progress
      */
     getTimeRemaining(): number {
         if (!this.isGameInProgress()) {
@@ -104,7 +104,7 @@ export class GameManager {
             reportError(
                 ErrorType.RUNTIME_ERROR,
                 '',
-                'Cancel Trivia Question was called while there was no trivia game in progress.',
+                'Cancel Game was called while there was no trivia game in progress.',
                 trigger
             );
             return;
@@ -125,11 +125,11 @@ export class GameManager {
 
         // Fire the cancellation event.
         this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.GAME_CANCELLED, {}, false);
-        logger('info', 'Trivia question has been canceled.');
+        logger('info', 'Trivia game has been canceled.');
     }
 
     /**
-     * Create a new trivia question
+     * Create a new trivia game
      */
     async createGame(trigger: Effects.Trigger): Promise<void> {
         const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
@@ -139,7 +139,7 @@ export class GameManager {
             reportError(
                 ErrorType.RUNTIME_ERROR,
                 '',
-                'Create Trivia Question effect was called while there was already a trivia question in progress.',
+                'Create Game effect was called while there was already a game in progress.',
                 trigger
             );
             return;
@@ -184,16 +184,16 @@ export class GameManager {
 
         // Emit the start event.
         this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.GAME_STARTED, {}, false);
-        logger('info', 'createGame: A trivia question has started.');
+        logger('info', 'createGame: A game has started.');
     }
 
     /**
      * End the current game
      */
     async endGame(): Promise<void> {
-        // Make sure there's actually a question in progress.
+        // Make sure there's actually a game in progress.
         if (!this.isGameInProgress()) {
-            logger('warn', `endGame: function was called while trivia is not in progress.`);
+            logger('warn', `endGame: function was called while game is not in progress.`);
             this.clearTemporaryState();
             return;
         }
@@ -387,7 +387,7 @@ export class GameManager {
 
         // Check if a game is in progress and ignore any answers outside of the game.
         if (!this.isGameInProgress()) {
-            logger('debug', `validateAnswer: Discarding possible trivia answer received while no question is in progress.`);
+            logger('debug', `validateAnswer: Discarding possible trivia answer received while no game is in progress.`);
             return -1;
         }
 

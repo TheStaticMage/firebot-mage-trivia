@@ -33,7 +33,7 @@ export const mageTriviaQuestion: ReplaceVariable = {
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
-            logger('warn', 'Called mageTriviaQuestion variable when no question was in progress or ended.');
+            logger('warn', 'Called mageTriviaQuestion variable when no game was in progress or ended.');
             return "";
         }
         return aq.question.questionText;
@@ -49,7 +49,7 @@ export const mageTriviaAnswers: ReplaceVariable = {
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
-            logger('warn', 'Called mageTriviaAnswers variable when no question was in progress or ended.');
+            logger('warn', 'Called mageTriviaAnswers variable when no game was in progress or ended.');
             return [];
         }
         const answers = aq.answers.map((answer, index) => {
@@ -69,7 +69,7 @@ export const mageTriviaCorrectAnswers: ReplaceVariable = {
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
-            logger('warn', 'Called mageTriviaCorrectAnswers variable when no question was in progress or ended.');
+            logger('warn', 'Called mageTriviaCorrectAnswers variable when no game was in progress or ended.');
             return [];
         }
         const correctAnswers = aq.correctAnswers.map((index) => {
@@ -89,7 +89,7 @@ export const mageTriviaPossibleAnswers: ReplaceVariable = {
     evaluator: async () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
-            logger('warn', 'Called mageTriviaPossibleAnswers variable when no question was in progress or ended.');
+            logger('warn', 'Called mageTriviaPossibleAnswers variable when no game was in progress or ended.');
             return [];
         }
         const possibleAnswers = aq.answers.map((_, index) => answerLabels[index]);

@@ -58,23 +58,23 @@ const eventSource: EventSource = {
     events: [
         {
             id: TriviaEvent.GAME_STARTED,
-            name: "Question Started",
-            description: "Fires when a question is first asked."
+            name: "Game Started",
+            description: "Fires when a game is first started."
         },
         {
             id: TriviaEvent.GAME_ENDED,
-            name: "Question Ended",
-            description: "Fires when a question's answer timer ends. (Does not fire if the question is cancelled.)"
+            name: "Game Ended",
+            description: "Fires when a game's answer timer ends. (Does not fire if the game is cancelled.)"
         },
         {
             id: TriviaEvent.GAME_CANCELLED,
-            name: "Question Cancelled",
-            description: "Fires when a question is cancelled."
+            name: "Game Cancelled",
+            description: "Fires when a game is cancelled."
         },
         {
             id: TriviaEvent.ANSWER_ACCEPTED,
             name: "Answer Accepted Timer Fired",
-            description: "Fires on a periodic basis while a question is in progress to acknowledge accepted answers."
+            description: "Fires on a periodic basis while a game is in progress to acknowledge accepted answers."
         },
         {
             id: TriviaEvent.ANSWER_REJECTED,
