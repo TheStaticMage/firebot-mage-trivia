@@ -1,11 +1,11 @@
+import { registerConditions } from './conditions';
+import { registerEffects } from './effects';
 import { TriviaGameEvents } from './events';
-import { FirebotManager } from './firebot';
+import { registerEventFilters } from './filters';
+import { FirebotManager, logger } from './firebot';
 import { GameManager } from './game';
 import { getQuestionManager, QuestionManager } from './questions/common';
-import { logger } from './firebot';
-import { registerEffects } from './effects';
 import { registerReplaceVariables } from './variables';
-import { registerEventFilters } from './filters';
 
 declare const SCRIPTS_DIR: string;
 
@@ -58,10 +58,11 @@ export class TriviaGame {
     }
 
     public async onLoad(): Promise<void> {
-        registerReplaceVariables(this);
+        registerConditions(this);
         registerEffects(this);
         registerEventFilters(this);
         this.triviaGameEvents.registerEvents();
+        registerReplaceVariables(this);
     }
 
     public async onUnload(): Promise<void> {
