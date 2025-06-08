@@ -8,19 +8,6 @@ import { logger } from '../firebot';
 import { TriviaGame, triviaGame } from '../globals';
 import { askedQuestion } from '../questions/common';
 
-export const mageTriviaGameInProgress: ReplaceVariable = {
-    definition: {
-        handle: "mageTriviaGameInProgress",
-        description: "Returns whether or not a trivia game is in progress.",
-        possibleDataOutput: ["bool"]
-    },
-    evaluator: async () => {
-        const data = triviaGame.getGameManager().isGameActive();
-        logger("debug", `mageTriviaGameInProgress: ${data}`);
-        return data;
-    }
-};
-
 export const mageTriviaQuestionAndAnswersRaw: ReplaceVariable = {
     definition: {
         handle: "mageTriviaQuestionAndAnswersRaw",

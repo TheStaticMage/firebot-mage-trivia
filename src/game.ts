@@ -73,6 +73,22 @@ export class GameManager {
     }
 
     /**
+     * Get the time remaining in the current question
+     * @returns The time remaining in seconds, or -1 if no question is active
+     */
+    getTimeRemaining(): number {
+        if (!this.isGameActive()) {
+            return -1;
+        }
+
+        const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
+        const elapsedTime = (Date.now() - this.gameState.questionStart) / 1000;
+        const timeLimit = triviaSettings.gameplaySettings.timeLimit;
+
+        return Math.max(0, timeLimit - elapsedTime);
+    }
+
+    /**
      * Check if a game is active
      */
     isGameActive(): boolean {
