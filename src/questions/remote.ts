@@ -2,6 +2,18 @@ import { logger } from '../firebot';
 import { ErrorType, reportError } from '../util/errors';
 import { Question, QuestionManager } from './common';
 
+type opentdbResponse = {
+    response_code: number;
+    results: Array<{
+        category: string;
+        type: string;
+        difficulty: string;
+        question: string;
+        correct_answer: string;
+        incorrect_answers: string[];
+    }>;
+};
+
 export class RemoteQuestionManager extends QuestionManager {
     private sessionToken: string;
 
@@ -57,7 +69,7 @@ export class RemoteQuestionManager extends QuestionManager {
                 '',
                 'Trivia questions cannot be initialized because the settings are misconfigured. You have not selected valid categories, difficulties, or types. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.'
             );
-            return undefined;
+            throw new Error('Invalid trivia settings');
         }
 
         const settings = this.triviaGame.getFirebotManager().getGameSettings();
@@ -65,37 +77,53 @@ export class RemoteQuestionManager extends QuestionManager {
         const difficulty = settings.triviaDataSettings.enabledDifficulties[Math.floor(Math.random() * settings.triviaDataSettings.enabledDifficulties.length)];
         const type = settings.triviaDataSettings.enabledTypes[Math.floor(Math.random() * settings.triviaDataSettings.enabledTypes.length)];
         const requestUrl = `https://opentdb.com/api.php?amount=1&category=${category}&difficulty=${difficulty}&type=${type}&encode=base64&token=${this.sessionToken}`;
+        logger('debug', `Requesting trivia question from opentdb with URL: ${requestUrl}`);
 
-        this.fetchUrl(requestUrl)
-            .then((data: any) => {
-                if (data && data.response_code === 0 && data.results.length > 0) {
-                    const result = data.results[0];
-                    const question: Question = {
-                        questionText: atob(result.question),
-                        correctAnswers: Array.isArray(result.correct_answers) ? result.correct_answers : [result.correct_answer],
-                        incorrectAnswers: Array.isArray(result.incorrect_answers) ? result.incorrect_answers : [result.incorrect_answer]
-                    };
-                    // Decode the answers from base64
-                    question.correctAnswers = question.correctAnswers.map(answer => atob(answer));
-                    question.incorrectAnswers = question.incorrectAnswers.map(answer => atob(answer));
-                    return question;
+        try {
+            const data: opentdbResponse = await this.fetchUrl(requestUrl);
+            if (data && data.response_code === 0 && data.results.length > 0) {
+                logger('debug', `Received trivia question from opentdb: ${JSON.stringify(data.results[0])}`);
+                const question: Question = {
+                    questionText: this.decodeBase64(data.results[0].question),
+                    correctAnswers: [this.decodeBase64(data.results[0].correct_answer)],
+                    incorrectAnswers: []
+                };
+
+                for (const answer of data.results[0].incorrect_answers) {
+                    question.incorrectAnswers.push(this.decodeBase64(answer));
                 }
-                reportError(
-                    ErrorType.CRITICAL_ERROR,
-                    `opentdb.com API response code: ${data?.response_code}`,
-                    'The API returned an unexpected response while fetching the trivia question.'
-                );
-                return undefined;
+                return question;
+            }
 
-            })
-            .catch((error: Error) => {
-                reportError(
-                    ErrorType.CRITICAL_ERROR,
-                    error.message,
-                    'An API error occurred while fetching the trivia question.'
-                );
-                return false;
-            });
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                `Response code: ${data?.response_code}`,
+                'An API error occurred while fetching the trivia question.'
+            );
+            return undefined;
+        } catch (error: any) {
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                error.message,
+                'An API error occurred while fetching the trivia question.'
+            );
+            return undefined;
+        }
+    }
+
+    private decodeBase64(encodedString: string): string {
+        try {
+            const result = atob(encodedString);
+            logger('debug', `Decoded base64 string: '${encodedString}' => '${result}'`);
+            return result;
+        } catch (error) {
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                `Input string: '${encodedString}'; Error decoding base64: ${error}`,
+                'An error occurred while decoding a base64 string.'
+            );
+            return '';
+        }
     }
 
     /**
