@@ -7,7 +7,7 @@ This is a multi-player chat trivia game for [Firebot](https://firebot.app/) (the
 Features:
 - Supports two sources of questions:
   - A local file with questions that you curate
-  - Online trivia database <https://opentdb.com/>
+  - Open Trivia Database <https://opentdb.com/>
 
 - Easy to play:
   - No `!commands` needed: just type A, B, C, D to answer
@@ -18,7 +18,7 @@ Features:
   - Configure penalty for incorrect answers, or set to 0 to encourage guessing
   - Configure a time bonus for faster correct answers
 
-Note that there is already a built-in trivia game that's part of Firebot. The built-in game allows users to request a question with a `!trivia <wager>` command, getting a question that only they answer. When I tried this on my stream, my chat was confused by answers only being accepted from the person who typed the command -- no matter how much I explained, multiple people were jumping in to answer the question each time. A secondary consideration was a desire to theme my trivia by curating my own questions. I wrote Mage Trivia to address these needs.
+Note that there is already a built-in trivia game that's part of Firebot. The built-in game allows users to request a question with a `!trivia <wager>` command, getting a question that only they answer. When I tried this on my stream, my chat never quite caught on to the fact that only the person who had requested the question could answer it. Everybody wanted to play along! In addition, I wanted to theme my trivia by curating my own questions. I wrote Mage Trivia to address these needs.
 
 Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) where you will find Mage Trivia powering "cat trivia" during ad breaks and every 15 minutes during the stream.
 
@@ -44,7 +44,7 @@ Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) wh
 
     - Check the "Enabled" box.
     - Expand "Currency Settings" and select the desired currency for the game.
-    - Check the"Allow Insufficient Balance" box.
+    - Check the "Allow Insufficient Balance" box.
         _This is just for now: if you created a new currency, you won't have any yet, and we want the quick start to work. You can leave this unchecked if you are using an existing currency._
     - Click the Save button.
 
@@ -66,17 +66,22 @@ Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) wh
 
     - Consider triggering the "ask question now" preset effect list via a command, quick action, or timer.
     - Customize the chat messages for the various Mage Trivia events to suit your style.
-    - Explore the [settings](/doc/reference/settings.md) as you see fit.
-    - Read the [Customization and Integration Guide](/doc/customization.md) for more customization ideas.
+    - Explore the [settings](/doc/reference/settings.md) to tweak the behavior as you prefer.
+    - Browse the [cookbook](/doc/cookbook/) for some ideas for further integration and customization.
     - Curate your own trivia questions according to the [Question Curation Guide](/doc/questions.md).
 
 ## Documentation
 
-- [Customization and Integration Guide](/doc/customization.md): Integrate Mage Trivia to your stream
 - [Question Curation Guide](/doc/questions.md): Curate your own set of questions and answers
+- Cookbook
+  - [Displaying Questions On Screen](/doc/cookbook/display-question-on-screen.md)
+  - [Heads-Up Before Questions](/doc/cookbook/heads-up-before-questions.md)
+  - [Restrict Answering to Followers](/doc/cookbook/restrict-answer-to-followers.md)
 - Reference
+  - [Conditions](/doc/reference/conditions.md)
   - [Effects](/doc/reference/effects.md)
   - [Events](/doc/reference/events.md)
+  - [Filters](/doc/reference/filters.md)
   - [Settings](/doc/reference/settings.md)
   - [Variables](/doc/reference/variables.md)
 
@@ -91,7 +96,7 @@ Bug reports and feature requests are welcome via [GitHub Issues](https://github.
 
 ## Contributing
 
-Contributions are welcome via [Pull Requests](https://github.com/TheStaticMage/firebot-mage-trivia/pulls). I _strongly suggest_ that you contact me before making significant changes, because I'd feel really bad if you spent a lot of time working on something that is not consistent with my vision for the project.
+Contributions are welcome via [Pull Requests](https://github.com/TheStaticMage/firebot-mage-trivia/pulls). I _strongly suggest_ that you contact me before making significant changes, because I'd feel really bad if you spent a lot of time working on something that is not consistent with my vision for the project. Please refer to the [Mage Trivia Contribution Guidelines](/.github/contributing.md) for specifics.
 
 ## License
 
