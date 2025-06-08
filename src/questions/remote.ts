@@ -1,26 +1,38 @@
 import { logger } from '../firebot';
+import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
 import { Question, QuestionManager } from './common';
 
-type opentdbResponse = {
+interface opentdbResponse {
     response_code: number;
-    results: Array<{
+    results: {
         category: string;
         type: string;
         difficulty: string;
         question: string;
         correct_answer: string;
         incorrect_answers: string[];
-    }>;
-};
+    }[];
+}
+
+interface opentdbSessionResponse {
+    token: string;
+    response_code: number;
+    response_message: string;
+}
 
 export class RemoteQuestionManager extends QuestionManager {
     private sessionToken: string;
 
+    constructor(triviaGame: TriviaGame) {
+        super(triviaGame);
+        this.sessionToken = '';
+    }
+
     /**
      * Initialize function entrypoint to be overridden by subclasses.
      */
-    async initializeQuestions(): Promise<boolean> {
+    initializeQuestions(): boolean {
         // We can warn in advance if the source is not set up correctly.
         if (!this.checkSettings()) {
             reportError(
@@ -35,23 +47,23 @@ export class RemoteQuestionManager extends QuestionManager {
         // questions from being asked multiple times.
         const requestUrl = 'https://opentdb.com/api_token.php?command=request';
         this.fetchUrl(requestUrl)
-            .then((data: any) => {
-                if (data && data.token) {
+            .then((data: opentdbSessionResponse) => {
+                if (data.token) {
                     this.sessionToken = data.token;
                     logger('debug', `Session token for trivia questions: ${this.sessionToken}`);
                 } else {
                     reportError(
                         ErrorType.CRITICAL_ERROR,
-                        `Response code: ${data?.response_code}`,
+                        `Response code: ${String(data.response_code)}`,
                         'An API error occurred while fetching the session token.'
                     );
                     return false;
                 }
             })
-            .catch((error: Error) => {
+            .catch((error: unknown) => {
                 reportError(
                     ErrorType.CRITICAL_ERROR,
-                    error.message,
+                    error instanceof Error ? error.message : String(error),
                     'An API error occurred while fetching the session token.'
                 );
                 return false;
@@ -76,12 +88,12 @@ export class RemoteQuestionManager extends QuestionManager {
         const category = settings.triviaDataSettings.enabledCategories[Math.floor(Math.random() * settings.triviaDataSettings.enabledCategories.length)];
         const difficulty = settings.triviaDataSettings.enabledDifficulties[Math.floor(Math.random() * settings.triviaDataSettings.enabledDifficulties.length)];
         const type = settings.triviaDataSettings.enabledTypes[Math.floor(Math.random() * settings.triviaDataSettings.enabledTypes.length)];
-        const requestUrl = `https://opentdb.com/api.php?amount=1&category=${category}&difficulty=${difficulty}&type=${type}&encode=base64&token=${this.sessionToken}`;
+        const requestUrl = `https://opentdb.com/api.php?amount=1&category=${String(category)}&difficulty=${String(difficulty)}&type=${String(type)}&encode=base64&token=${this.sessionToken}`;
         logger('debug', `Requesting trivia question from opentdb with URL: ${requestUrl}`);
 
         try {
-            const data: opentdbResponse = await this.fetchUrl(requestUrl);
-            if (data && data.response_code === 0 && data.results.length > 0) {
+            const data = await this.fetchUrl(requestUrl) as opentdbResponse;
+            if (data.response_code === 0 && data.results.length > 0) {
                 logger('debug', `Received trivia question from opentdb: ${JSON.stringify(data.results[0])}`);
                 const question: Question = {
                     questionText: this.decodeBase64(data.results[0].question),
@@ -97,14 +109,14 @@ export class RemoteQuestionManager extends QuestionManager {
 
             reportError(
                 ErrorType.CRITICAL_ERROR,
-                `Response code: ${data?.response_code}`,
+                `Response code: ${String(data.response_code)}`,
                 'An API error occurred while fetching the trivia question.'
             );
             return undefined;
         } catch (error: any) {
             reportError(
                 ErrorType.CRITICAL_ERROR,
-                error.message,
+                error instanceof Error ? error.message : String(error),
                 'An API error occurred while fetching the trivia question.'
             );
             return undefined;
@@ -119,7 +131,7 @@ export class RemoteQuestionManager extends QuestionManager {
         } catch (error) {
             reportError(
                 ErrorType.CRITICAL_ERROR,
-                `Input string: '${encodedString}'; Error decoding base64: ${error}`,
+                `Input string: '${encodedString}'; Error decoding base64: ${error instanceof Error ? error.message : String(error)}`,
                 'An error occurred while decoding a base64 string.'
             );
             return '';
@@ -141,23 +153,25 @@ export class RemoteQuestionManager extends QuestionManager {
     private fetchUrl(url: string): Promise<any> {
         return new Promise((resolve, reject) => {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const timeoutId = setTimeout(() => { controller.abort(); }, 5000);
 
             fetch(url, { signal: controller.signal })
                 .then((response) => {
                     clearTimeout(timeoutId);
                     if (!response.ok) {
-                        reject(new Error(`HTTP error! status: ${response.status}`));
+                        reject(new Error(`HTTP error! status: ${String(response.status)}`));
                     } else {
                         return response.json();
                     }
                 })
-                .then(data => resolve(data))
-                .catch((error) => {
-                    if (error.name === 'AbortError') {
+                .then(data => { resolve(data); })
+                .catch((error: unknown) => {
+                    if (error instanceof Error && error.name === 'AbortError') {
                         reject(new Error('Request timed out'));
-                    } else {
+                    } else if (error instanceof Error) {
                         reject(error);
+                    } else {
+                        reject(new Error(String(error)));
                     }
                 });
         });

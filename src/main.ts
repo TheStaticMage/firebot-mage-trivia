@@ -19,7 +19,7 @@ const script: Firebot.CustomScript<object> = {
     getDefaultParameters: () => {
         return {};
     },
-    run: async (runRequest) => {
+    run: (runRequest) => {
         // Set our run request variable for use throughout the app.
         const firebotManager = new FirebotManager(runRequest);
 
@@ -34,20 +34,20 @@ const script: Firebot.CustomScript<object> = {
             description: 'Allow your viewers to earn currency by answering multiple-choice questions.',
             icon: 'fa-solid fa-question',
             settingCategories: gameSettings(),
-            onLoad: async () => {
-                await triviaGame.onLoad();
+            onLoad: () => {
+                triviaGame.onLoad();
             },
-            onUnload: async () => {
-                await triviaGame.onUnload();
+            onUnload: () => {
+                triviaGame.onUnload();
             },
-            onSettingsUpdate: async () => {
-                await triviaGame.onSettingsUpdate();
+            onSettingsUpdate: () => {
+                triviaGame.onSettingsUpdate();
             }
         });
 
         // Initializing the questions must happen after the game is registered.
         triviaGame.initializeQuestionManager();
-        await triviaGame.getQuestionManager().initializeQuestions();
+        triviaGame.getQuestionManager().initializeQuestions();
     }
 };
 

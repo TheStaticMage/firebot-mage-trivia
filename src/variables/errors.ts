@@ -17,7 +17,7 @@ export const mageTriviaError: ReplaceVariable = {
             ]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: (trigger: Effects.Trigger) => {
         const safeMessage = trigger.metadata.eventData?.safeMessage as string;
         if (!safeMessage) {
             logger('warn', `Called mageTriviaError variable without error message. ${JSON.stringify(trigger.metadata)}`);
@@ -41,7 +41,7 @@ export const mageTriviaErrorFull: ReplaceVariable = {
             ]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: (trigger: Effects.Trigger) => {
         const safeMessage = trigger.metadata.eventData?.safeMessage as string;
         if (!safeMessage) {
             logger('warn', `Called mageTriviaErrorFullDONOTUSETHISINCHAT variable without error message. ${JSON.stringify(trigger.metadata)}`);

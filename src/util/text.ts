@@ -12,14 +12,14 @@ export function formatTime(seconds: number): string {
     }
 
     if (minutes === 0) {
-        return remainingSeconds === 1 ? '1 second' : `${remainingSeconds} seconds`;
+        return remainingSeconds === 1 ? '1 second' : `${remainingSeconds.toString()} seconds`;
     }
 
     if (remainingSeconds === 0) {
-        return minutes === 1 ? '1 minute' : `${minutes} minutes`;
+        return minutes === 1 ? '1 minute' : `${minutes.toString()} minutes`;
     }
 
-    return `${minutes}m ${remainingSeconds}s`;
+    return `${minutes.toString()}m ${remainingSeconds.toString()}s`;
 }
 
 /**
@@ -35,7 +35,7 @@ export function joinWithAnd(items: string[]): string {
     } else if (items.length === 2) {
         return `${items[0]} and ${items[1]}`;
     }
-    const lastItem = items.pop();
+    const lastItem = items.pop() ?? '';
     return `${items.join(', ')}, and ${lastItem}`;
 
 }
@@ -53,7 +53,7 @@ export function joinWithOr(items: string[]): string {
     } else if (items.length === 2) {
         return `${items[0]} or ${items[1]}`;
     }
-    const lastItem = items.pop();
+    const lastItem = items.pop() ?? '';
     return `${items.join(', ')}, or ${lastItem}`;
 
 }

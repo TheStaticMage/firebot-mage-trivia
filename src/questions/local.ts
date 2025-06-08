@@ -9,13 +9,15 @@ import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
 import { Question, QuestionManager } from './common';
 
-type yamlQuestionType = {
+interface yamlQuestionType {
     questionText: string;
     knewIt?: string;
-    answers: {
-        answerText: string;
-        isCorrect: boolean;
-    }[];
+    answers: yamlQuestionAnswerType[];
+}
+
+interface yamlQuestionAnswerType {
+    answerText: string;
+    isCorrect: boolean;
 }
 
 export class LocalQuestionManager extends QuestionManager {
@@ -35,7 +37,7 @@ export class LocalQuestionManager extends QuestionManager {
     /**
      * Initialize the questions from file
      */
-    async initializeQuestions(): Promise<boolean> {
+    initializeQuestions(): boolean {
         logger('debug', 'Initializing questions.');
 
         const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
@@ -45,16 +47,16 @@ export class LocalQuestionManager extends QuestionManager {
         if (!questions) {
             return false;
         }
-        logger('debug', `${questions.size} questions have been loaded from the file.`);
+        logger('debug', `${String(questions.size)} questions have been loaded from the file.`);
 
         this.questionDB.flushAll();
 
         questions.forEach((value, key) => {
             this.questionDB.set(key, value);
         });
-        logger('debug', `${questions.size} questions have been initialized into the cache.`);
+        logger('debug', `${String(questions.size)} questions have been initialized into the cache.`);
 
-        await this.loadUsedQuestions();
+        this.loadUsedQuestions();
 
         return true;
     }
@@ -63,49 +65,43 @@ export class LocalQuestionManager extends QuestionManager {
      * Get a new random question that hasn't been answered
      */
     async getNewQuestion(): Promise<Question | undefined> {
-        let returnedQuestion: Question | undefined;
+        let questionKeys = this.questionDB.keys();
+        logger('debug', `There are ${String(questionKeys.length)} questions in the database.`);
 
-        await this.mutex.runExclusive(async (): Promise<void> => {
-            let questionKeys = this.questionDB.keys();
-            logger('debug', `There are ${questionKeys.length} questions in the database.`);
+        if (questionKeys.length === 0 && this.initializeQuestions()) {
+            questionKeys = this.questionDB.keys();
+            logger('warn', `Reloaded questions from file; there are now ${String(questionKeys.length)} questions in the database.`);
+        }
 
-            if (questionKeys.length === 0 && this.initializeQuestions()) {
-                questionKeys = this.questionDB.keys();
-                logger('warn', `Reloaded questions from file; there are now ${questionKeys.length} questions in the database.`);
+        const answeredQuestions = this.usedQuestionsCache.keys();
+        logger('debug', `There are ${String(answeredQuestions.length)} questions that have been answered.`);
+
+        let unansweredQuestions = this.getUnansweredQuestions();
+        logger('debug', `There are ${String(unansweredQuestions.length)} questions that have not been answered.`);
+
+        if (questionKeys.length > 0 && unansweredQuestions.length === 0) {
+            const settings = this.triviaGame.getFirebotManager().getGameSettings();
+            if (settings.otherSettings.recycleQuestions) {
+                this.initializeQuestions();
+                this.recycleUsedQuestions();
+                unansweredQuestions = this.getUnansweredQuestions();
             }
+        }
 
-            const answeredQuestions = this.usedQuestionsCache.keys();
-            logger('debug', `There are ${answeredQuestions.length} questions that have been answered.`);
+        if (unansweredQuestions.length === 0) {
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                '',
+                'No questions are available to ask. You either need to add more questions to the trivia file or enable the "Recycle Questions" setting.'
+            );
+            return;
+        }
 
-            let unansweredQuestions = this.getUnansweredQuestions();
-            logger('debug', `There are ${unansweredQuestions.length} questions that have not been answered.`);
+        const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
+        const randomQuestionKey = unansweredQuestions[randomIndex];
+        this.markQuestionAsUsed(randomQuestionKey);
 
-            if (questionKeys.length > 0 && unansweredQuestions.length === 0) {
-                const settings = this.triviaGame.getFirebotManager().getGameSettings();
-                if (settings.otherSettings.recycleQuestions) {
-                    this.initializeQuestions();
-                    this.recycleUsedQuestions();
-                    unansweredQuestions = this.getUnansweredQuestions();
-                }
-            }
-
-            if (unansweredQuestions.length === 0) {
-                reportError(
-                    ErrorType.CRITICAL_ERROR,
-                    '',
-                    'No questions are available to ask. You either need to add more questions to the trivia file or enable the "Recycle Questions" setting.'
-                );
-                return;
-            }
-
-            const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
-            const randomQuestionKey = unansweredQuestions[randomIndex];
-            await this.markQuestionAsUsed(randomQuestionKey);
-
-            returnedQuestion = this.questionDB.get(randomQuestionKey);
-        });
-
-        return returnedQuestion;
+        return this.questionDB.get(randomQuestionKey);
     }
 
     /**
@@ -118,32 +114,32 @@ export class LocalQuestionManager extends QuestionManager {
         } catch (error) {
             reportError(
                 ErrorType.CRITICAL_ERROR,
-                `${filePath}: ${error}`,
+                `${filePath}: ${String(error)}`,
                 "Error reading trivia file. Please check the file path and ensure it exists."
             );
             return;
         }
 
-        let questions: any[] = [];
+        let questions: yamlQuestionType[] = [];
         try {
             questions = yaml.load(fileContents) as yamlQuestionType[];
         } catch (error) {
             reportError(
                 ErrorType.CRITICAL_ERROR,
-                `${error}`,
+                String(error),
                 "Error parsing trivia file. Please check that the file is in the correct format."
             );
             return;
         }
 
         const file: string = path.basename(filePath, path.extname(filePath));
-        const questionMap: Map<string, Question> = new Map();
+        const questionMap = new Map<string, Question>();
 
         questions.forEach((question) => {
             const formattedQuestion: Question = {
                 questionText: question.questionText,
-                correctAnswers: question.answers.filter((answer: any) => answer.isCorrect).map((answer: any) => String(answer.answerText)),
-                incorrectAnswers: question.answers.filter((answer: any) => !answer.isCorrect).map((answer: any) => String(answer.answerText))
+                correctAnswers: question.answers.filter((answer: yamlQuestionAnswerType) => answer.isCorrect).map((answer: yamlQuestionAnswerType) => String(answer.answerText)),
+                incorrectAnswers: question.answers.filter((answer: yamlQuestionAnswerType) => !answer.isCorrect).map((answer: yamlQuestionAnswerType) => String(answer.answerText))
             };
 
             if (formattedQuestion.correctAnswers.length === 0) {
@@ -166,15 +162,15 @@ export class LocalQuestionManager extends QuestionManager {
      * Mark a question as used
      * @param questionKey The key of the question to mark as used
      */
-    private async markQuestionAsUsed(questionKey: string): Promise<void> {
+    private markQuestionAsUsed(questionKey: string): void {
         this.usedQuestionsCache.set(questionKey, true);
-        await this.saveUsedQuestions();
+        this.saveUsedQuestions();
     }
 
     /**
      * Load used questions from the file
      */
-    private async loadUsedQuestions(): Promise<void> {
+    private loadUsedQuestions(): void {
         const settings = this.triviaGame.getFirebotManager().getGameSettings();
         if (!settings.otherSettings.persistAskedQuestionsToFile) {
             return;
@@ -186,29 +182,28 @@ export class LocalQuestionManager extends QuestionManager {
             return;
         }
 
-        await this.fileMutex.runExclusive(async (): Promise<void> => {
-            try {
-                const usedQuestionsData = fs.readFileSync(usedQuestionsFilePath, 'utf8');
-                const usedQuestions = JSON.parse(usedQuestionsData);
-                if (Array.isArray(usedQuestions)) {
-                    this.usedQuestionsCache.flushAll();
-                    usedQuestions.forEach((questionKey: string) => {
-                        this.usedQuestionsCache.set(questionKey, true);
-                    });
-                    logger('debug', `Loaded ${usedQuestions.length} used questions from ${usedQuestionsFilePath}.`);
-                } else {
-                    logger('warn', `Used questions file (${usedQuestionsFilePath}) is not an array. No questions loaded.`);
-                }
-            } catch (error) {
-                logger('warn', `Used questions file (${usedQuestionsFilePath}) could not be read. No questions loaded. ${error}`);
+
+        try {
+            const usedQuestionsData = fs.readFileSync(usedQuestionsFilePath, 'utf8');
+            const usedQuestions = JSON.parse(usedQuestionsData) as string[];
+            if (Array.isArray(usedQuestions)) {
+                this.usedQuestionsCache.flushAll();
+                usedQuestions.forEach((questionKey: string) => {
+                    this.usedQuestionsCache.set(questionKey, true);
+                });
+                logger('debug', `Loaded ${String(usedQuestions.length)} used questions from ${usedQuestionsFilePath}.`);
+            } else {
+                logger('warn', `Used questions file (${usedQuestionsFilePath}) is not an array. No questions loaded.`);
             }
-        });
+        } catch (error) {
+            logger('warn', `Used questions file (${usedQuestionsFilePath}) could not be read. No questions loaded. ${String(error)}`);
+        }
     }
 
     /**
      * Save the used questions to a file
      */
-    private async saveUsedQuestions(): Promise<void> {
+    private saveUsedQuestions(): void {
         const settings = this.triviaGame.getFirebotManager().getGameSettings();
         if (!settings.otherSettings.persistAskedQuestionsToFile) {
             return;
@@ -220,34 +215,32 @@ export class LocalQuestionManager extends QuestionManager {
             return;
         }
 
-        await this.fileMutex.runExclusive(async (): Promise<void> => {
-            try {
-                const usedQuestionsFileDir = path.dirname(usedQuestionsFilePath);
-                if (!fs.existsSync(usedQuestionsFileDir)) {
-                    fs.mkdirSync(usedQuestionsFileDir);
-                    logger('debug', `Created directory for used questions file: ${usedQuestionsFileDir}`);
-                }
-
-                const usedQuestions = this.usedQuestionsCache.keys();
-                fs.writeFileSync(usedQuestionsFilePath, JSON.stringify(usedQuestions, null, 2));
-                logger('debug', `Saved ${usedQuestions.length} used questions to ${usedQuestionsFilePath}.`);
-            } catch (error) {
-                reportError(
-                    ErrorType.CRITICAL_ERROR,
-                    `Error saving used questions file: ${usedQuestionsFilePath}: ${error}`,
-                    'An error occurred while saving the used questions file.'
-                );
+        try {
+            const usedQuestionsFileDir = path.dirname(usedQuestionsFilePath);
+            if (!fs.existsSync(usedQuestionsFileDir)) {
+                fs.mkdirSync(usedQuestionsFileDir);
+                logger('debug', `Created directory for used questions file: ${usedQuestionsFileDir}`);
             }
-        });
+
+            const usedQuestions = this.usedQuestionsCache.keys();
+            fs.writeFileSync(usedQuestionsFilePath, JSON.stringify(usedQuestions, null, 2));
+            logger('debug', `Saved ${String(usedQuestions.length)} used questions to ${usedQuestionsFilePath}.`);
+        } catch (error) {
+            reportError(
+                ErrorType.CRITICAL_ERROR,
+                `Error saving used questions file: ${usedQuestionsFilePath}: ${String(error)}`,
+                'An error occurred while saving the used questions file.'
+            );
+        }
     }
 
     /**
      * Recycle used questions by flushing the cache and saving the state
      */
-    private async recycleUsedQuestions(): Promise<void> {
+    private recycleUsedQuestions(): void {
         logger('info', 'Recycling used questions.');
         this.usedQuestionsCache.flushAll();
-        await this.saveUsedQuestions();
+        this.saveUsedQuestions();
     }
 
     /**

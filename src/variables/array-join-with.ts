@@ -36,8 +36,8 @@ export const arrayJoinWith : ReplaceVariable = {
 
         if (typeof subject === 'string' || subject instanceof String) {
             try {
-                subject = JSON.parse(`${subject}`);
-            } catch (ignore) {
+                subject = JSON.parse(subject as string) as unknown[];
+            } catch {
                 return '';
             }
         }
@@ -51,9 +51,9 @@ export const arrayJoinWith : ReplaceVariable = {
         } else if (items.length === 1) {
             return items[0];
         } else if (items.length === 2) {
-            return `${items[0]} ${lastWord} ${items[1]}`;
+            return `${items[0]} ${lastWord as string} ${items[1]}`;
         }
-        const lastItem = items.pop();
-        return `${items.join(', ')} ${lastWord} ${lastItem}`;
+        const lastItem = items.pop() ?? '';
+        return `${items.join(', ')} ${lastWord as string} ${lastItem}`;
     }
 };

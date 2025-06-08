@@ -1,14 +1,16 @@
 import { answerLabels } from '../constants';
 import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
+import { LocalQuestionManager } from './local';
+import { RemoteQuestionManager } from './remote';
 
-export type Question = {
+export interface Question {
     questionText: string;
     correctAnswers: string[];
     incorrectAnswers: string[];
-};
+}
 
-export type askedQuestion = {
+export interface askedQuestion {
     question: Question;
     answers: string[];
     correctAnswers: number[];
@@ -17,17 +19,10 @@ export type askedQuestion = {
 export function getQuestionManager(triviaGame: TriviaGame): QuestionManager {
     const triviaSettings = triviaGame.getFirebotManager().getGameSettings();
     if (triviaSettings.triviaDataSettings.triviaSource === 'File') {
-        return new (require('./local').LocalQuestionManager)(triviaGame);
-    } else if (triviaSettings.triviaDataSettings.triviaSource === 'API') {
-        return new (require('./remote').RemoteQuestionManager)(triviaGame);
+        return new LocalQuestionManager(triviaGame);
+    } else {
+        return new RemoteQuestionManager(triviaGame);
     }
-    reportError(
-        ErrorType.CRITICAL_ERROR,
-        '',
-        'Trivia game is not correctly configured with a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.'
-    );
-    return new QuestionManager(triviaGame);
-
 }
 
 export class QuestionManager {
@@ -40,7 +35,7 @@ export class QuestionManager {
     /**
      * Initialize function entrypoint to be overridden by subclasses.
      */
-    async initializeQuestions(): Promise<boolean> {
+    initializeQuestions(): boolean {
         // This method should be overridden by subclasses to load questions.
         reportError(
             ErrorType.CRITICAL_ERROR,
@@ -53,6 +48,7 @@ export class QuestionManager {
     /**
      * Get question entrypoint to be overridden by subclasses.
      */
+    // eslint-disable-next-line @typescript-eslint/require-await
     async getNewQuestion(): Promise<Question | undefined> {
         // This method should be overridden by subclasses to return a new question.
         reportError(
@@ -108,6 +104,7 @@ export class QuestionManager {
             if (String(a).toLowerCase() === 'false' && String(b).toLowerCase() === 'true') {
                 return 1;
             }
+            return 0;
         });
 
         // Create a map of answers to their correctness status.

@@ -5,9 +5,7 @@ import { triviaGame } from '../globals';
 const TRIVIA_CANCEL_QUESTION_EFFECT_ID = "magetrivia:trivia:cancelQuestion";
 const TRIVIA_CANCEL_QUESTION_EFFECT_NAME = "[Mage Trivia] Cancel Trivia Question";
 
-type cancelGameInput = Record<string, never>
-
-export const cancelGameEffect: Firebot.EffectType<cancelGameInput> = {
+export const cancelGameEffect: Firebot.EffectType<any> = {
     definition: {
         id: TRIVIA_CANCEL_QUESTION_EFFECT_ID,
         name: TRIVIA_CANCEL_QUESTION_EFFECT_NAME,
@@ -16,7 +14,9 @@ export const cancelGameEffect: Firebot.EffectType<cancelGameInput> = {
         categories: ["scripting"]
     },
     optionsTemplate: "",
-    optionsController: () => {},
+    optionsController: () => {
+        // No options to control for this effect
+    },
     optionsValidator: () => {
         return [];
     },

@@ -14,7 +14,7 @@ export const mageTriviaQuestionAndAnswersRaw: ReplaceVariable = {
         description: "Returns the current or most recently asked question and answer choices (raw object).",
         possibleDataOutput: ["object"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const question = triviaGame.getGameManager().getQuestion();
         if (!question) {
             logger('warn', 'Called mageTriviaQuestionAndAnswersRaw variable when no question was available.');
@@ -30,7 +30,7 @@ export const mageTriviaQuestion: ReplaceVariable = {
         description: "Returns the text of the current or most-recently-asked question.",
         possibleDataOutput: ["text"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
             logger('warn', 'Called mageTriviaQuestion variable when no game was in progress or ended.');
@@ -46,7 +46,7 @@ export const mageTriviaAnswers: ReplaceVariable = {
         description: "Returns an array with the answers (with their letters) of the current or most-recently-asked question.",
         possibleDataOutput: ["array"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
             logger('warn', 'Called mageTriviaAnswers variable when no game was in progress or ended.');
@@ -66,7 +66,7 @@ export const mageTriviaCorrectAnswers: ReplaceVariable = {
         description: "Returns an array with the correct answers (with their letters) of the current or most-recently-asked question.",
         possibleDataOutput: ["array"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
             logger('warn', 'Called mageTriviaCorrectAnswers variable when no game was in progress or ended.');
@@ -86,7 +86,7 @@ export const mageTriviaPossibleAnswers: ReplaceVariable = {
         description: "Returns an array of the possible answer letters for the current or most-recently-asked question.",
         possibleDataOutput: ["array"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const aq = getAskedQuestion(triviaGame);
         if (!aq) {
             logger('warn', 'Called mageTriviaPossibleAnswers variable when no game was in progress or ended.');
@@ -104,12 +104,8 @@ export const mageTriviaGameResultsRaw: ReplaceVariable = {
         description: "Returns the raw object containing the results of the last trivia game played. (An empty object is returned if the game is not completed.)",
         possibleDataOutput: ["object"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const lastGameResults = triviaGame.getGameManager().getGameState();
-        if (!lastGameResults) {
-            logger('warn', 'Called mageTriviaGameResultsRaw variable when the game state was not initialized.');
-            return {};
-        }
         if (!lastGameResults.complete) {
             logger('warn', 'Called mageTriviaGameResultsRaw variable when the game was not completed.');
             return {};
@@ -126,18 +122,14 @@ export const mageTriviaWinners: ReplaceVariable = {
         description: "Returns an array of the winners of the last trivia game played. (An empty array is returned if the game is not completed.)",
         possibleDataOutput: ["array"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const lastGameResults = triviaGame.getGameManager().getGameState();
-        if (!lastGameResults) {
-            logger('warn', 'Called mageTriviaWinners variable when no last game results were available.');
-            return [];
-        }
         if (!lastGameResults.complete) {
             logger('warn', 'Called mageTriviaWinners variable when the game was not completed.');
             return [];
         }
         const winners = lastGameResults.winners.map((winner) => {
-            return `${winner.userDisplayName}`;
+            return winner.userDisplayName;
         });
         logger('debug', `mageTriviaWinners: ${JSON.stringify(winners)}`);
         return winners;
@@ -150,18 +142,14 @@ export const mageTriviaWinnersWithPoints: ReplaceVariable = {
         description: "Returns an array of the winners of the last trivia game played with their points. (An empty array is returned if the game is not completed.)",
         possibleDataOutput: ["array"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const lastGameResults = triviaGame.getGameManager().getGameState();
-        if (!lastGameResults) {
-            logger('warn', 'Called mageTriviaLastGameWinnersWithPoints variable when no last game results were available.');
-            return [];
-        }
         if (!lastGameResults.complete) {
             logger('warn', 'Called mageTriviaLastGameWinnersWithPoints variable when the game was not completed.');
             return [];
         }
         const winnersWithPoints = lastGameResults.winners.map((winner) => {
-            return `${winner.userDisplayName} (+${winner.points})`;
+            return `${winner.userDisplayName} (+${String(winner.points)})`;
         });
         logger('debug', `mageTriviaLastGameWinnersWithPoints: ${JSON.stringify(winnersWithPoints)}`);
         return winnersWithPoints;
@@ -175,9 +163,5 @@ function getAskedQuestion(triviaGame: TriviaGame): askedQuestion | undefined {
     }
 
     const lastResult = triviaGame.getGameManager().getGameState();
-    if (lastResult) {
-        return lastResult.askedQuestion;
-    }
-
-    return undefined;
+    return lastResult.askedQuestion;
 }

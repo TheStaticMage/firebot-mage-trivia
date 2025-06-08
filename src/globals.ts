@@ -20,10 +20,10 @@ export class TriviaGame {
     private triviaGameEvents: TriviaGameEvents;
 
     constructor(firebotManager: FirebotManager) {
-        triviaGame = this;
         this.firebotManager = firebotManager;
         this.gameManager = new GameManager(this);
         this.triviaGameEvents = new TriviaGameEvents(this);
+        this.questionManager = getQuestionManager(this);
     }
 
     public getGameManager(): GameManager {
@@ -48,7 +48,7 @@ export class TriviaGame {
             const profileDirectory = path.join(SCRIPTS_DIR, '..');
             const usedQuestionsPathSplit = usedQuestionsPath.split('/');
             const result = path.join(profileDirectory, ...usedQuestionsPathSplit);
-            logger('debug', `Got used question persistence path from alternate method: ${result} (error: ${error})`);
+            logger('debug', `Got used question persistence path from alternate method: ${result} (error: ${error instanceof Error ? error.message : String(error)})`);
             return result;
         }
     }
@@ -57,7 +57,7 @@ export class TriviaGame {
         return this.questionManager;
     }
 
-    public async onLoad(): Promise<void> {
+    public onLoad(): void {
         registerConditions(this);
         registerEffects(this);
         registerEventFilters(this);
@@ -65,16 +65,17 @@ export class TriviaGame {
         registerReplaceVariables(this);
     }
 
-    public async onUnload(): Promise<void> {
+    public onUnload(): void {
         // Nothing as of now
     }
 
-    public async onSettingsUpdate(): Promise<void> {
-        this.initializeQuestionManager();
-        await this.getQuestionManager().initializeQuestions();
+    public onSettingsUpdate(): void {
+        this.questionManager = getQuestionManager(this);
+        this.getQuestionManager().initializeQuestions();
     }
 
     public initializeQuestionManager(): void {
-        this.questionManager = getQuestionManager(this);
+        // Initialize the question manager.
+        this.questionManager.initializeQuestions();
     }
 }

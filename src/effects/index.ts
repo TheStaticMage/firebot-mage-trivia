@@ -14,6 +14,6 @@ export function registerEffects(triviaGame: TriviaGame): void {
         triviaGame.getFirebotManager().registerEffect(createGameEffect);
         logger('info', "Trivia effects successfully registered");
     } catch (error) {
-        logger('error', `Failed to register effects: ${error}`);
+        logger('error', `Failed to register effects: ${error instanceof Error ? error.message : String(error)}`);
     }
 }

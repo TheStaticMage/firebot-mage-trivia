@@ -9,9 +9,9 @@ export const mageTriviaGameInProgress: ReplaceVariable = {
         description: "Returns whether or not a trivia game is in progress.",
         possibleDataOutput: ["bool"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const data = triviaGame.getGameManager().isGameInProgress();
-        logger("debug", `mageTriviaGameInProgress: ${data}`);
+        logger("debug", `mageTriviaGameInProgress: ${String(data)}`);
         return data;
     }
 };
@@ -22,10 +22,10 @@ export const mageTriviaGameTimeRemaining: ReplaceVariable = {
         description: "Returns the time remaining in the current trivia game in seconds. If no game is in progress, returns -1.",
         possibleDataOutput: ["number"]
     },
-    evaluator: async () => {
+    evaluator: () => {
         const gameManager = triviaGame.getGameManager();
         const timeRemaining = gameManager.getTimeRemaining();
-        logger("debug", `mageTriviaGameTimeRemaining: ${timeRemaining}`);
+        logger("debug", `mageTriviaGameTimeRemaining: ${String(timeRemaining)}`);
         return timeRemaining;
     }
 };

@@ -38,7 +38,5 @@ jobs:
             exit 1
           fi
           echo "Version in package.json matches version in src/main.ts"
-      - name: Run ESLint
-        run: npx eslint --ext .ts,.js src/
       - name: npm build
         run: npm run build

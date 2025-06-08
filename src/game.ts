@@ -1,7 +1,7 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
-import { AnswerAcceptedMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
+import { AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
@@ -11,7 +11,7 @@ import { stripTrailingInvisibleCharacters } from './util/text';
 /**
  * Entry for a user's answer to a question
  */
-type AnswerEntry = {
+interface AnswerEntry {
     answerAt: number;
     answerIndex: number;
     award: number;
@@ -23,8 +23,8 @@ type AnswerEntry = {
 /**
  * Metadata for a question that has ended
  */
-export type GameState = {
-    askedQuestion: askedQuestion; // The asked question object containing the question and answers
+export interface GameState {
+    askedQuestion: askedQuestion | undefined; // The asked question object containing the question and answers
     inProgress: boolean; // Indicates if the game is in progress
     complete: boolean; // Indicates if the game is complete
     losers: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of users who answered incorrectly
@@ -55,7 +55,7 @@ export class GameManager {
         this.answerCache = new NodeCache({checkperiod: 5});
         this.answerAcceptedTimer = undefined;
         this.questionTimer = undefined;
-        this.initGameState();
+        this.gameState = emptyGameState;
     }
 
     /**
@@ -92,7 +92,7 @@ export class GameManager {
      * Check if a game is in progress
      */
     isGameInProgress(): boolean {
-        return this.gameState && this.gameState.inProgress;
+        return this.gameState.inProgress;
     }
 
     /**
@@ -111,13 +111,13 @@ export class GameManager {
         }
 
         // Refund all wagers.
-        this.answerCache.keys().forEach((user) => {
+        for (const user of this.answerCache.keys()) {
             const entry = this.answerCache.get<AnswerEntry>(user);
             if (entry) {
-                logger('debug', `cancelGame: Refunding wager of ${entry.wager} for user ${user}.`);
-                this.triviaGame.getFirebotManager().adjustCurrencyForUser(entry.wager, user);
+                logger('debug', `cancelGame: Refunding wager of ${String(entry.wager)} for user ${user}.`);
+                await this.triviaGame.getFirebotManager().adjustCurrencyForUser(entry.wager, user);
             }
-        });
+        }
 
         // Clear everything.
         this.clearTemporaryState();
@@ -170,16 +170,15 @@ export class GameManager {
         this.gameState.inProgress = true;
 
         // Start the locked-in notification timer.
-        const self = this;
-        this.answerAcceptedTimer = setTimeout(() =>
-            self.answerAcceptedHandler(true),
-        triviaSettings.otherSettings.confirmationInterval * 1000
+        this.answerAcceptedTimer = setTimeout(() => {
+            this.answerAcceptedHandler(true);
+        }, triviaSettings.otherSettings.confirmationInterval * 1000
         );
 
         // Set the end-of-game timer.
         const answerTimeout = triviaSettings.gameplaySettings.timeLimit;
         this.questionTimer = setTimeout(() => {
-            self.endGame();
+            void this.endGame();
         }, answerTimeout * 1000);
 
         // Emit the start event.
@@ -203,28 +202,30 @@ export class GameManager {
             clearTimeout(this.answerAcceptedTimer);
             this.answerAcceptedTimer = undefined;
         }
-        await this.answerAcceptedHandler(false);
+        this.answerAcceptedHandler(false);
 
         // Award points to users who answered correctly and update the final
         // stats in the game state.
         const winnerPoints = new Map<string, number>();
-        this.answerCache.keys().forEach((user) => {
+        for (const user of this.answerCache.keys()) {
             const cacheEntry = this.answerCache.get<AnswerEntry>(user);
             if (cacheEntry?.correct) {
-                logger('debug', `User ${user} answered the question correctly. Awarding ${cacheEntry.award} points (includes refunding wager of ${cacheEntry.wager}).`);
-                this.triviaGame.getFirebotManager().adjustCurrencyForUser(cacheEntry.award, user);
+                logger('debug', `User ${user} answered the question correctly. Awarding ${String(cacheEntry.award)} points (includes refunding wager of ${String(cacheEntry.wager)}).`);
+                await this.triviaGame.getFirebotManager().adjustCurrencyForUser(cacheEntry.award, user);
                 winnerPoints.set(user, cacheEntry.award - cacheEntry.wager);
                 this.gameState.totalAwarded += cacheEntry.award - cacheEntry.wager;
                 this.gameState.totalCorrect++;
             } else {
                 this.gameState.totalIncorrect++;
-                this.gameState.totalLost += cacheEntry?.wager || 0;
+                this.gameState.totalLost += cacheEntry?.wager ?? 0;
             }
             this.gameState.totalPlayers++;
-        });
+        }
 
         // Prepare and send the game ended event.
-        const sortedWinnerNames = Array.from(winnerPoints.keys()).sort((a, b) => winnerPoints.get(b) - winnerPoints.get(a));
+        const sortedWinnerNames = Array.from(winnerPoints.keys()).sort((a, b) =>
+            (winnerPoints.get(b) ?? 0) - (winnerPoints.get(a) ?? 0)
+        );
         const winnersWithPoints: { username: string; points: number }[] = [];
         for (const winner of sortedWinnerNames) {
             const points = winnerPoints.get(winner);
@@ -237,14 +238,24 @@ export class GameManager {
             .filter(user => !this.answerCache.get<AnswerEntry>(user)?.correct)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
-                return { username: username, userDisplayName: entry.userDisplayName || username, answer: entry?.answerIndex || -1, points: entry?.wager || 0 };
+                return {
+                    username: username,
+                    userDisplayName: entry?.userDisplayName ?? username,
+                    answer: entry?.answerIndex ?? -1,
+                    points: entry?.wager ?? 0
+                };
             });
 
         this.gameState.winners = Array.from(winnerPoints.keys())
             .filter(user => winnerPoints.get(user) !== undefined)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
-                return { username: username, userDisplayName: entry.userDisplayName || username, answer: entry?.answerIndex || -1, points: winnerPoints.get(username) || 0 };
+                return {
+                    username: username,
+                    userDisplayName: entry?.userDisplayName ?? username,
+                    answer: entry?.answerIndex ?? -1,
+                    points: winnerPoints.get(username) ?? 0
+                };
             });
 
         this.gameState.complete = true;
@@ -276,11 +287,13 @@ export class GameManager {
         // We might allow users to change their answer.
         if (this.answerCache.has(username)) {
             const entry = this.answerCache.get<AnswerEntry>(username);
-            wager = entry.wager; // Wager was already deducted when the user first answered.
+            if (entry) {
+                wager = entry.wager; // Wager was already deducted when the user first answered.
+            }
 
             if (!triviaSettings.gameplaySettings.permitAnswerChange) {
                 logger('debug', `handleAnswer: User ${username} has already answered the question.`);
-                const rejection: AnswerRejectedMetadata = {
+                const rejection: Record<string, unknown> = {
                     username: username,
                     answerIndex: answerIndex,
                     balance: userBalance,
@@ -292,34 +305,37 @@ export class GameManager {
                 return false;
             }
 
-            if (entry.answerIndex === answerIndex) {
+            if (entry && entry.answerIndex === answerIndex) {
                 logger('debug', `handleAnswer: User ${username} has already answered the question with the same answer.`);
                 return false;
             }
 
             // If we get here the user changed their answer. However we don't want
             // to deduct the wager again, so there's no currency adjustment.
-            logger('debug', `handleAnswer: User ${username} changed their answer to ${answerLabels[answerIndex]}. Previous answer was ${answerLabels[entry.answerIndex]}. Original wager was ${wager}.`);
+            if (entry) {
+                const previousAnswer = answerLabels[entry.answerIndex];
+                logger('debug', `handleAnswer: User ${username} changed their answer to ${answerLabels[answerIndex]}. Previous answer was ${previousAnswer}. Original wager was ${String(wager)}.`);
+            }
         } else {
             // Check if the user has enough currency to cover an incorrect
             // answer. Adjust their wager downward if insufficient balances are
             // permitted.
             if (userBalance < triviaSettings.currencySettings.wager) {
                 if (!triviaSettings.currencySettings.allowInsufficientBalance) {
-                    logger('debug', `handleAnswer: User ${username} does not have enough currency to wager ${wager}.`);
-                    const rejection: AnswerRejectedMetadata = {
+                    logger('debug', `handleAnswer: User ${username} does not have enough currency to wager ${String(wager)}.`);
+                    const rejection: Record<string, unknown> = {
                         username: username,
                         answerIndex: answerIndex,
                         balance: userBalance,
                         wager: wager,
                         reasonCode: AnswerRejectionReason.INSUFFICIENT_BALANCE,
-                        reasonMessage: `You do not have enough currency to play. You need at least ${wager}.`
+                        reasonMessage: `You do not have enough currency to play. You need at least ${String(wager)}.`
                     };
                     this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_REJECTED, rejection, false);
                     return false;
                 }
 
-                logger('debug', `handleAnswer: User ${username} does not have enough currency to wager ${wager} but is allowed to play. Wagering ${userBalance} instead.`);
+                logger('debug', `handleAnswer: User ${username} does not have enough currency to wager ${String(wager)} but is allowed to play. Wagering ${String(userBalance)} instead.`);
                 wager = userBalance;
             }
 
@@ -327,8 +343,8 @@ export class GameManager {
             // be re-added at the end of the question if the answer is correct,
             // but we don't want to tip off the user (or others) to correct
             // answers.
-            this.triviaGame.getFirebotManager().adjustCurrencyForUser(-wager, username);
-            logger('debug', `handleAnswer: User ${username} wagered ${wager} on the question.`);
+            await this.triviaGame.getFirebotManager().adjustCurrencyForUser(-wager, username);
+            logger('debug', `handleAnswer: User ${username} wagered ${String(wager)} on the question.`);
         }
 
         // Create the answer cache entry for this user.
@@ -342,7 +358,7 @@ export class GameManager {
         };
 
         // If the user answered correctly, award them the wager amount plus the time bonus.
-        if (this.gameState.askedQuestion.correctAnswers.includes(answerIndex)) {
+        if (this.gameState.askedQuestion?.correctAnswers.includes(answerIndex)) {
             logger('debug', `handleAnswer: Trivia answer correct: ${username} answered ${answerLabels[answerIndex]}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
 
             const maxBonus = triviaSettings.currencySettings.timeBonus;
@@ -357,9 +373,13 @@ export class GameManager {
             entry.award = totalPoints;
             entry.correct = true;
 
-            logger('debug', `handleAnswer: Points calculation for ${username}: totalPoints=${totalPoints} wager=${wager}, timeBonusFactor=${timeBonusFactor}, decayFactor=${triviaSettings.currencySettings.timeBonusDecay}, elapsedTime=${elapsedTime}, maxTime=${maxTime}.`);
+            logger('debug', `handleAnswer: Points calculation for ${username}: totalPoints=${String(totalPoints)} wager=${String(wager)}, timeBonusFactor=${String(timeBonusFactor)}, decayFactor=${String(triviaSettings.currencySettings.timeBonusDecay)}, elapsedTime=${String(elapsedTime)}, maxTime=${String(maxTime)}.`);
         } else {
-            logger('debug', `handleAnswer: Answer incorrect: ${username} answered ${answerLabels[answerIndex]}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
+            logger('debug', `handleAnswer: Answer incorrect: ${username} answered ${answerLabels[answerIndex]}. Correct answer(s): ${
+                this.gameState.askedQuestion
+                    ? this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')
+                    : 'N/A'
+            }.`);
         }
 
         // Remember the user's answer.
@@ -385,6 +405,12 @@ export class GameManager {
             return -1;
         }
 
+        // Make sure a question is currently defined.
+        if (!this.gameState.askedQuestion) {
+            logger('debug', `validateAnswer: No question is currently asked.`);
+            return -1;
+        }
+
         // Check if a game is in progress and ignore any answers outside of the game.
         if (!this.isGameInProgress()) {
             logger('debug', `validateAnswer: Discarding possible trivia answer received while no game is in progress.`);
@@ -405,24 +431,26 @@ export class GameManager {
     /**
      * Notify users who have successfully submitted their answers.
      */
-    async answerAcceptedHandler(reschedule: boolean): Promise<void> {
+    answerAcceptedHandler(reschedule: boolean): void {
         const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
 
         // Find users who have locked in their answers since the last notification
         const usernames = this.answersAccepted.keys();
         if (usernames.length > 0) {
             logger('debug', `answerAcceptedHandler: Trivia answers accepted for: ${usernames.join(', ')}`);
-            const locked: AnswerAcceptedMetadata = {
+            const metadata: Record<string, unknown> = {
                 usernames: usernames.sort()
-            };
-            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_ACCEPTED, locked, false);
+            }
+
+            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_ACCEPTED, metadata, false);
             this.answersAccepted.flushAll();
         }
 
         // Reschedule the next run for this function
         if (reschedule) {
-            this.answerAcceptedTimer = setTimeout(() =>
-                this.answerAcceptedHandler(true),
+            this.answerAcceptedTimer = setTimeout(() => {
+                this.answerAcceptedHandler(true);
+            },
             triviaSettings.otherSettings.confirmationInterval * 1000
             );
         } else if (this.answerAcceptedTimer) {
@@ -462,18 +490,20 @@ export class GameManager {
      * Initialize the game state to starting values
      */
     private initGameState(): void {
-        this.gameState = {
-            askedQuestion: undefined,
-            inProgress: false,
-            complete: false,
-            losers: [],
-            winners: [],
-            questionStart: 0,
-            totalLost: 0,
-            totalAwarded: 0,
-            totalPlayers: 0,
-            totalCorrect: 0,
-            totalIncorrect: 0
-        };
+        this.gameState = emptyGameState;
     }
 }
+
+const emptyGameState: GameState = {
+    askedQuestion: undefined,
+    inProgress: false,
+    complete: false,
+    losers: [],
+    winners: [],
+    questionStart: 0,
+    totalLost: 0,
+    totalAwarded: 0,
+    totalPlayers: 0,
+    totalCorrect: 0,
+    totalIncorrect: 0
+};

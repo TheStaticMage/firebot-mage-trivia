@@ -52,13 +52,14 @@ export class FirebotManager {
         const gameSettings = this.getGameSettings();
         const { currencyId } = gameSettings.currencySettings;
 
-        return currencyDb.getCurrencyById(currencyId).name;
+        const currency = currencyDb.getCurrencyById(currencyId);
+        return currency ? currency.name : '';
     }
 
     public getGameSettings(): GameSettings {
         const { gameManager } = this.firebot.modules;
         const settings = gameManager.getGameSettings(TRIVIA_GAME_ID);
-        return settings.settings as GameSettings;
+        return settings.settings as unknown as GameSettings;
     }
 
     public getStreamerUsername(): string {
@@ -80,17 +81,17 @@ export class FirebotManager {
         const fblogger = this.firebot.modules.logger;
 
         switch (type) {
-            case 'debug':
-                fblogger.debug(`${TRIVIA_GAME_ABBR}: ${message}`);
-                break;
-            case 'error':
-                fblogger.error(`${TRIVIA_GAME_ABBR}: ${message}`);
-                break;
-            case 'warn':
-                fblogger.warn(`${TRIVIA_GAME_ABBR}: ${message}`);
-                break;
-            default:
-                fblogger.info(`${TRIVIA_GAME_ABBR}: ${message}`);
+        case 'debug':
+            fblogger.debug(`${TRIVIA_GAME_ABBR}: ${message}`);
+            break;
+        case 'error':
+            fblogger.error(`${TRIVIA_GAME_ABBR}: ${message}`);
+            break;
+        case 'warn':
+            fblogger.warn(`${TRIVIA_GAME_ABBR}: ${message}`);
+            break;
+        default:
+            fblogger.info(`${TRIVIA_GAME_ABBR}: ${message}`);
         }
     }
 

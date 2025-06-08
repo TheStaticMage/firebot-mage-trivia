@@ -13,9 +13,9 @@ export const mageTriviaAnswerAccepted: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_ACCEPTED}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: (trigger: Effects.Trigger) => {
         const usernames = trigger.metadata.eventData?.usernames as string[];
-        if (!usernames || usernames.length === 0) {
+        if (usernames.length === 0) {
             logger('warn', `Called mageTriviaAnswerAccepted variable without usernames. ${JSON.stringify(trigger.metadata)}`);
             return [];
         }
@@ -34,12 +34,8 @@ export const mageTriviaAnswerRejected: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_REJECTED}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
-        const metadata = trigger.metadata as AnswerRejectedMetadata;
-        if (!metadata) {
-            logger('warn', 'Called mageTriviaAnswerRejected variable without metadata.');
-            return {};
-        }
+    evaluator: (trigger: Effects.Trigger) => {
+        const metadata = trigger.metadata as unknown as AnswerRejectedMetadata;
         logger('debug', `mageTriviaAnswerRejected: ${metadata.reasonMessage}`);
         return metadata.reasonMessage;
     }
@@ -55,12 +51,8 @@ export const mageTriviaAnswerRejectedRaw: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_REJECTED}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
-        const metadata = trigger.metadata as AnswerRejectedMetadata;
-        if (!metadata) {
-            logger('warn', 'Called mageTriviaAnswerRejectedRaw variable without metadata.');
-            return {};
-        }
+    evaluator: (trigger: Effects.Trigger) => {
+        const metadata = trigger.metadata as unknown as AnswerRejectedMetadata;
         logger('debug', `mageTriviaAnswerRejectedRaw: ${JSON.stringify(metadata)}`);
         return metadata;
     }

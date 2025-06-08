@@ -1,6 +1,6 @@
 import { SettingCategoryDefinition } from '@crowbartools/firebot-custom-scripts-types/types/modules/game-manager';
 
-export type GameSettings = {
+export interface GameSettings {
     currencySettings: {
         currencyId: string;
         wager: number;
@@ -27,7 +27,7 @@ export type GameSettings = {
         recycleQuestions: boolean;
         enableTriviaErrorFull: boolean;
     };
-};
+}
 
 export function gameSettings(): Record<string, SettingCategoryDefinition> {
     return {

@@ -27,14 +27,14 @@ export enum AnswerRejectionReason {
 /**
  * Metadata for an answer that was accepted (TRIVIA_ANSWER_ACCEPTED_EVENT)
  */
-export type AnswerAcceptedMetadata = {
+export interface AnswerAcceptedMetadata {
     usernames: string[];
 }
 
 /**
  * Metadata for an answer that was rejected (TRIVIA_ANSWER_REJECTED_EVENT)
  */
-export type AnswerRejectedMetadata = {
+export interface AnswerRejectedMetadata {
     username: string;
     answerIndex: number;
     balance: number | undefined;
@@ -46,7 +46,7 @@ export type AnswerRejectedMetadata = {
 /**
  * Metadata for a critical error or runtime error (TRIVIA_ERROR_CRITICAL_EVENT or TRIVIA_ERROR_RUNTIME_EVENT)
  */
-export type ErrorMetadata = {
+export interface ErrorMetadata {
     message: string;
     safeMessage: string; // A sanitized version of the error message that can be safely displayed in chat
     trigger?: any; // Optional trigger data if the error was triggered by a specific event
