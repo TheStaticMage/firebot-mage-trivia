@@ -6,14 +6,14 @@ import { gameSettings } from './settings';
 
 const scriptVersion = '0.0.1';
 
-const script: Firebot.CustomScript<{}> = {
+const script: Firebot.CustomScript<object> = {
     getScriptManifest: () => {
         return {
             name: 'Mage Trivia Game',
             description: 'A chat based multiplayer trivia game.',
             author: 'TheStaticMage',
             version: scriptVersion,
-            firebotVersion: '5',
+            firebotVersion: '5'
         };
     },
     getDefaultParameters: () => {
@@ -42,13 +42,13 @@ const script: Firebot.CustomScript<{}> = {
             },
             onSettingsUpdate: async () => {
                 await triviaGame.onSettingsUpdate();
-            },
+            }
         });
 
         // Initializing the questions must happen after the game is registered.
         triviaGame.initializeQuestionManager();
         await triviaGame.getQuestionManager().initializeQuestions();
-    },
+    }
 };
 
 export default script;

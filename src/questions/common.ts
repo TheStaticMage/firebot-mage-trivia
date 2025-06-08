@@ -20,10 +20,14 @@ export function getQuestionManager(triviaGame: TriviaGame): QuestionManager {
         return new (require('./local').LocalQuestionManager)(triviaGame);
     } else if (triviaSettings.triviaDataSettings.triviaSource === 'API') {
         return new (require('./remote').RemoteQuestionManager)(triviaGame);
-    } else {
-        reportError(ErrorType.CRITICAL_ERROR, 'Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.', undefined);
-        return new QuestionManager(triviaGame);
     }
+    reportError(
+        ErrorType.CRITICAL_ERROR,
+        '',
+        'Trivia game is not correctly configured with a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.'
+    );
+    return new QuestionManager(triviaGame);
+
 }
 
 export class QuestionManager {
@@ -38,7 +42,11 @@ export class QuestionManager {
      */
     async initializeQuestions(): Promise<boolean> {
         // This method should be overridden by subclasses to load questions.
-        reportError(ErrorType.CRITICAL_ERROR, 'Trivia questions cannot be initialized because you have not selected a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.', undefined);
+        reportError(
+            ErrorType.CRITICAL_ERROR,
+            '',
+            'Trivia game is not correctly configured with a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.'
+        );
         return false;
     }
 
@@ -47,7 +55,11 @@ export class QuestionManager {
      */
     async getNewQuestion(): Promise<Question | undefined> {
         // This method should be overridden by subclasses to return a new question.
-        reportError(ErrorType.CRITICAL_ERROR, 'A trivia question cannot be asked because you have not selected a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.', undefined);
+        reportError(
+            ErrorType.CRITICAL_ERROR,
+            '',
+            'Trivia game is not correctly configured with a question source. Go to Games > Mage Trivia > Trivia Data Settings and configure appropriately.'
+        );
         return undefined;
     }
 
@@ -73,7 +85,7 @@ export class QuestionManager {
             });
         } else {
             // Shuffle the answers array randomly.
-            answers = answers.sort((_a, _b) => {
+            answers = answers.sort(() => {
                 // Random sort
                 return Math.random() - 0.5;
             });
@@ -107,7 +119,7 @@ export class QuestionManager {
         return {
             question: question,
             answers: answers,
-            correctAnswers: question.correctAnswers.map(answer => answers.indexOf(answer)),
+            correctAnswers: question.correctAnswers.map(answer => answers.indexOf(answer))
         };
     }
 }
