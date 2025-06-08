@@ -8,7 +8,9 @@
         "sourceMap": true,
         "moduleResolution": "node",
         "experimentalDecorators": true,
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "strict": true,
+        "strictNullChecks": true
     },
     "include": ["./src/**/*"]
 }

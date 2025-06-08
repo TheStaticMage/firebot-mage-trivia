@@ -5,9 +5,7 @@ import { triviaGame } from '../globals';
 const TRIVIA_CREATE_QUESTION_EFFECT_ID = "magetrivia:trivia:createQuestion";
 const TRIVIA_CREATE_QUESTION_EFFECT_NAME = "[Mage Trivia] Create Trivia Question";
 
-type createGameInput = Record<string, never>;
-
-export const createGameEffect: Firebot.EffectType<createGameInput> = {
+export const createGameEffect: Firebot.EffectType<any> = {
     definition: {
         id: TRIVIA_CREATE_QUESTION_EFFECT_ID,
         name: TRIVIA_CREATE_QUESTION_EFFECT_NAME,

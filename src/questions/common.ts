@@ -108,6 +108,7 @@ export class QuestionManager {
             if (String(a).toLowerCase() === 'false' && String(b).toLowerCase() === 'true') {
                 return 1;
             }
+            return 0;
         });
 
         // Create a map of answers to their correctness status.
