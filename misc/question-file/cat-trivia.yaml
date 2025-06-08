@@ -1,0 +1,21 @@
+- questionText: What is the proper term for a group of kittens?
+  knewIt: "that a group of kittens is called a kindle"
+  answers:
+    - answerText: Kindle
+      isCorrect: true
+    - answerText: Kettle
+      isCorrect: false
+    - answerText: Kaboodle
+      isCorrect: false
+    - answerText: Kinder
+      isCorrect: false
+- questionText: A human has 650 skeletal muscles, while a cat has about ...?
+  answers:
+    - answerText: 100
+      isCorrect: false
+    - answerText: 250
+      isCorrect: false
+    - answerText: 500
+      isCorrect: true
+    - answerText: 750
+      isCorrect: false
