@@ -1,6 +1,8 @@
 name: Feature Request
 description: Feature Request
-type: "Feature"
+labels:
+  - Feature
+title: "[Feature Request] Your feature request title here"
 body:
   - type: textarea
     attributes:

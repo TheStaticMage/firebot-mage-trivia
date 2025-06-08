@@ -1,6 +1,8 @@
 name: Bug Report
 description: Bug Report
-type: "Bug"
+labels:
+  - Bug
+title: "[Bug Report] Your bug report title here"
 body:
   - type: textarea
     attributes:
