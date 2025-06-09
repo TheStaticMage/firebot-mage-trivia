@@ -37,7 +37,7 @@ export const arrayJoinWith : ReplaceVariable = {
         if (typeof subject === 'string' || subject instanceof String) {
             try {
                 subject = JSON.parse(`${subject}`);
-            } catch (ignore) {
+            } catch {
                 return '';
             }
         }

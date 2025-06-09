@@ -14,7 +14,9 @@ export const cancelGameEffect: Firebot.EffectType<any> = {
         categories: ["scripting"]
     },
     optionsTemplate: "",
-    optionsController: () => {},
+    optionsController: () => {
+        // No options needed for this effect
+    },
     optionsValidator: () => {
         return [];
     },

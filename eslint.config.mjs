@@ -20,100 +20,84 @@ export default tseslint.config(
         },
         rules: {
             '@stylistic/indent': ['warn', 4],
+            '@typescript-eslint/array-type': 'warn',
+            '@typescript-eslint/ban-ts-comment': 'warn',
+            '@typescript-eslint/consistent-generic-constructors': 'warn',
+            '@typescript-eslint/no-empty-function': 'warn',
+            '@typescript-eslint/no-this-alias': 'warn',
+            '@typescript-eslint/no-unused-vars': 'warn',
             '@typescript-eslint/restrict-template-expressions': 'off',
+            'array-bracket-spacing': 'warn',
+            'arrow-parens': ['warn', 'as-needed', { requireForBlockBody: true }],
+            'arrow-spacing': 'warn',
+            'block-spacing': 'warn',
+            'brace-style': 'warn',
+            'camelcase': 'warn',
+            'comma-dangle': 'warn',
+            'comma-spacing': 'warn',
+            'comma-style': 'warn',
+            'computed-property-spacing': 'warn',
+            'curly': 'warn',
+            'eqeqeq': ['warn', 'smart'],
+            'guard-for-in': 'warn',
+            'indent': 'off', // Superseded by TS
+            'key-spacing': ['warn', { mode: 'strict' }],
+            'keyword-spacing': 'warn',
+            'linebreak-style': 'warn',
+            'new-cap': 'warn',
+            'no-async-promise-executor': 'warn',
+            'no-confusing-arrow': 'warn',
+            'no-console': 'warn',
+            'no-debugger': 'warn',
+            'no-else-return': 'warn',
+            'no-empty': ['error'],
+            'no-eval': 'warn',
+            'no-extra-boolean-cast': 'warn',
+            'no-floating-decimal': 'warn',
+            'no-lone-blocks': 'warn',
+            'no-multi-spaces': 'warn',
+            'no-prototype-builtins': 'off',
+            'no-throw-literal': 'warn',
+            'no-trailing-spaces': 'warn',
+            'no-undef': 'off', // Superseded by TS
+            'no-unused-expressions': 'warn',
+            'no-unused-vars': 'off', // Superseded by TS
+            'no-use-before-define': 'off',
+            'no-useless-concat': 'error',
+            'no-var': 'warn',
+            'no-warning-comments': 'off',
+            'no-with': 'warn',
+            'prefer-const': 'warn',
+            'prefer-template': 'warn',
+            'semi-spacing': ['warn', { before: false, after: true }],
+            'semi-style': 'warn',
+            'semi': 'warn',
+            'space-before-blocks': 'warn',
+            'space-in-parens': ['warn', 'never'],
+            'space-infix-ops': 'warn',
+            'space-unary-ops': 'warn',
+            'strict': 'off', // Superseded by TS
+            'switch-colon-spacing': 'warn',
+            'template-curly-spacing': ['warn', 'never'],
+            'wrap-iife': ['warn', 'any'],
 
-            '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
-            '@typescript-eslint/no-unnecessary-condition': 'off',
-            '@typescript-eslint/require-await': 'off',
+            // To evaluate and possibly fix later
+            '@typescript-eslint/consistent-type-definitions': 'off',
+            '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-floating-promises': 'off',
             '@typescript-eslint/no-misused-promises': 'off',
-            '@typescript-eslint/no-unsafe-assignment': 'off',
-            '@typescript-eslint/no-unsafe-member-access': 'off',
-            '@typescript-eslint/no-unsafe-call': 'off',
-            '@typescript-eslint/no-unsafe-return': 'off',
+            '@typescript-eslint/no-require-imports': 'off',
+            '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
+            '@typescript-eslint/no-unnecessary-condition': 'off',
             '@typescript-eslint/no-unsafe-argument': 'off',
-            '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unsafe-call': 'off',
+            '@typescript-eslint/no-unsafe-member-access': 'off',
+            '@typescript-eslint/no-unsafe-return': 'off',
+            '@typescript-eslint/no-var-requires': 'off',
             '@typescript-eslint/prefer-promise-reject-errors': 'off',
-
-            'no-unused-vars': 'off',
-            '@typescript-eslint/no-unused-vars': 'off',
-            '@typescript-eslint/no-explicit-any': 'off',
-            // Deviations from https://eslint.org/docs/rules/#possible-errors
-            "no-console": 0, // Enable the use of console
-
-            // Deviations from < https://eslint.org/docs/rules/#best-practices >
-            eqeqeq: ["warn", "smart"], // No coersion unless comparing against null
-            "guard-for-in": "warn", // require an if statement with for-in loops
-            "no-else-return": "warn", // no 'if () { return } else { ... }
-            "no-eval": "warn", // no eval()
-            "no-floating-decimal": "warn", // no trailing decimals after numbers
-            "no-lone-blocks": "warn", // see: https://eslint.org/docs/rules/no-lone-blocks
-            "no-multi-spaces": "warn", // no repeating spaces
-            "no-throw-literal": "warn", // must throw an error instance
-            "no-unused-expressions": "warn", // see: https://eslint.org/docs/rules/no-unused-expressions#disallow-unused-expressions-no-unused-expressions
-            "no-with": "warn", // no with statements
-            "wrap-iife": ["warn", "any"], // immediately called functions must be wrapped in ()'s
-            "no-async-promise-executor": "off",
-            "no-prototype-builtins": "off",
-
-            // Deviation from < https://eslint.org/docs/rules/#strict-mode >
-            strict: "off", // disabled b/c typescript
-
-            // Deviation from < https://eslint.org/docs/rules/#variables >
-            "no-use-before-define": "off", // require vars to be defined before use
-
-            "prefer-const": "warn",
-
-            // Deviation from < https://eslint.org/docs/rules/#stylistic-issues >
-            "arrow-parens": ["warn", "as-needed", { requireForBlockBody: true }], // Parentheses around arrow function parameters
-            "array-bracket-spacing": "warn", // Spaces around array []'s
-            "block-spacing": "warn", // {}'s must have whitespace around them
-            "brace-style": "warn", // See: https://eslint.org/docs/rules/brace-style#require-brace-style-brace-style
-            camelcase: "warn", // useCamelCasePleaseKThanks
-            "comma-dangle": "warn", // No trailing commas
-            "comma-spacing": "warn", // Reqire space after commas
-            "comma-style": "warn", // See: https://eslint.org/docs/rules/comma-style
-            "computed-property-spacing": "warn", // No whitespace when using object[thing]
-            curly: "warn", // Must wrap blocks with {}
-            indent: "off", // Superseded by TS
-            "key-spacing": ["warn", { mode: "strict" }], // Exactly one space after object key colons
-            "keyword-spacing": "warn", // Spaces around keywords
-            "linebreak-style": "warn", // Line breaks must be \n
-            "new-cap": "warn", // Constructors must start with capital letter
-            "no-trailing-spaces": "warn", // no trailing spaces
-            semi: "warn", // semi-colons required
-            "semi-spacing": ["warn", { before: false, after: true }], // space after semi-colon, no space before
-            "semi-style": "warn", // See: https://eslint.org/docs/rules/semi-style
-            "space-before-blocks": "warn", // whitespace required before and after {}
-            "space-in-parens": ["warn", "never"], // See: https://eslint.org/docs/rules/space-in-parens
-            "space-infix-ops": "warn", // Spaces required areound operators
-            "space-unary-ops": "warn", // See: https://eslint.org/docs/rules/space-unary-ops
-            "switch-colon-spacing": "warn", // Spaces after case colon
-
-            // Deviation from < https://eslint.org/docs/rules/#ecmascript-6 >
-            "arrow-spacing": "warn", // Spaces required around fat-arrow function's "=>"
-            "no-confusing-arrow": "warn", // Don't use arrows functions in conditions
-            "no-var": "warn", // Use let/const instead of var
-
-            // Other deviations
-            "prefer-template": "warn", // Use template strings instead of + concat
-            "template-curly-spacing": ["warn", "never"],
-            "no-useless-concat": "error", // no concat'ing literal strings
-            "no-empty": ["error", { allowEmptyCatch: true }],
-            "no-debugger": "warn",
-            "no-extra-boolean-cast": "off",
-            "no-warning-comments": "off",
-
-            // typescript
-            "@typescript-eslint/no-var-requires": "off",
-            "@typescript-eslint/no-empty-function": "off",
-            "@typescript-eslint/no-this-alias": "off",
-            "@typescript-eslint/ban-ts-comment": "off",
-            "@typescript-eslint/no-require-imports": "off",
-            "no-undef": "off", // Superseded by TS
-            "@typescript-eslint/consistent-type-definitions": 'off',
-            "@typescript-eslint/consistent-generic-constructors": 'off',
-            "@typescript-eslint/array-type": "off"
-        },
+            '@typescript-eslint/require-await': 'off',
+            '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
+        }
     }
 );

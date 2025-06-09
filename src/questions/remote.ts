@@ -5,14 +5,14 @@ import { Question, QuestionManager } from './common';
 
 type opentdbResponse = {
     response_code: number;
-    results: Array<{
+    results: {
         category: string;
         type: string;
         difficulty: string;
         question: string;
         correct_answer: string;
         incorrect_answers: string[];
-    }>;
+    }[];
 };
 
 export class RemoteQuestionManager extends QuestionManager {

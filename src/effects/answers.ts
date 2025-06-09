@@ -15,7 +15,9 @@ export const answerEffect: Firebot.EffectType<any> = {
         dependencies: ["chat"]
     },
     optionsTemplate: "",
-    optionsController: () => {},
+    optionsController: () => {
+        // No options needed for this effect
+    },
     optionsValidator: () => {
         return [];
     },

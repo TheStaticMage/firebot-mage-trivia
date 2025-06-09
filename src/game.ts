@@ -184,16 +184,14 @@ export class GameManager {
         this.gameState.inProgress = true;
 
         // Start the locked-in notification timer.
-        const self = this;
-        this.answerAcceptedTimer = setTimeout(() =>
-            self.answerAcceptedHandler(true),
-        triviaSettings.otherSettings.confirmationInterval * 1000
-        );
+        this.answerAcceptedTimer = setTimeout(() => {
+            this.answerAcceptedHandler(true);
+        }, triviaSettings.otherSettings.confirmationInterval * 1000);
 
         // Set the end-of-game timer.
         const answerTimeout = triviaSettings.gameplaySettings.timeLimit;
         this.questionTimer = setTimeout(() => {
-            self.endGame();
+            this.endGame();
         }, answerTimeout * 1000);
 
         // Emit the start event.
