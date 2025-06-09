@@ -136,7 +136,7 @@ export const mageTriviaWinners: ReplaceVariable = {
             return [];
         }
         const winners = lastGameResults.winners.map((winner) => {
-            return `${winner.userDisplayName}`;
+            return winner.userDisplayName;
         });
         logger('debug', `mageTriviaWinners: ${JSON.stringify(winners)}`);
         return winners;

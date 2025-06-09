@@ -24,7 +24,7 @@ type AnswerEntry = {
  * Metadata for a question that has ended
  */
 export type GameState = {
-    askedQuestion: askedQuestion; // The asked question object containing the question and answers
+    askedQuestion: askedQuestion | undefined; // The asked question object containing the question and answers
     inProgress: boolean; // Indicates if the game is in progress
     complete: boolean; // Indicates if the game is complete
     losers: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of users who answered incorrectly
@@ -36,6 +36,20 @@ export type GameState = {
     totalCorrect: number; // Total number of correct answers
     totalIncorrect: number; // Total number of incorrect answers
 }
+
+const emptyGameState: GameState = {
+    askedQuestion: undefined,
+    inProgress: false,
+    complete: false,
+    losers: [],
+    winners: [],
+    questionStart: 0,
+    totalLost: 0,
+    totalAwarded: 0,
+    totalPlayers: 0,
+    totalCorrect: 0,
+    totalIncorrect: 0
+};
 
 /**
  * Manages the state and operations for trivia games
@@ -55,7 +69,7 @@ export class GameManager {
         this.answerCache = new NodeCache({checkperiod: 5});
         this.answerAcceptedTimer = undefined;
         this.questionTimer = undefined;
-        this.initGameState();
+        this.gameState = emptyGameState;
     }
 
     /**
@@ -224,7 +238,7 @@ export class GameManager {
         });
 
         // Prepare and send the game ended event.
-        const sortedWinnerNames = Array.from(winnerPoints.keys()).sort((a, b) => winnerPoints.get(b) - winnerPoints.get(a));
+        const sortedWinnerNames = Array.from(winnerPoints.keys()).sort((a, b) => (winnerPoints?.get(b) || 0) - (winnerPoints?.get(a) || 0));
         const winnersWithPoints: { username: string; points: number }[] = [];
         for (const winner of sortedWinnerNames) {
             const points = winnerPoints.get(winner);
@@ -237,14 +251,14 @@ export class GameManager {
             .filter(user => !this.answerCache.get<AnswerEntry>(user)?.correct)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
-                return { username: username, userDisplayName: entry.userDisplayName || username, answer: entry?.answerIndex || -1, points: entry?.wager || 0 };
+                return { username: username, userDisplayName: entry?.userDisplayName || username, answer: entry?.answerIndex || -1, points: entry?.wager || 0 };
             });
 
         this.gameState.winners = Array.from(winnerPoints.keys())
             .filter(user => winnerPoints.get(user) !== undefined)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
-                return { username: username, userDisplayName: entry.userDisplayName || username, answer: entry?.answerIndex || -1, points: winnerPoints.get(username) || 0 };
+                return { username: username, userDisplayName: entry?.userDisplayName || username, answer: entry?.answerIndex || -1, points: winnerPoints.get(username) || 0 };
             });
 
         this.gameState.complete = true;
@@ -276,7 +290,7 @@ export class GameManager {
         // We might allow users to change their answer.
         if (this.answerCache.has(username)) {
             const entry = this.answerCache.get<AnswerEntry>(username);
-            wager = entry.wager; // Wager was already deducted when the user first answered.
+            wager = entry?.wager || 0; // Wager was already deducted when the user first answered.
 
             if (!triviaSettings.gameplaySettings.permitAnswerChange) {
                 logger('debug', `handleAnswer: User ${username} has already answered the question.`);
@@ -292,14 +306,14 @@ export class GameManager {
                 return false;
             }
 
-            if (entry.answerIndex === answerIndex) {
+            if (entry?.answerIndex === answerIndex) {
                 logger('debug', `handleAnswer: User ${username} has already answered the question with the same answer.`);
                 return false;
             }
 
             // If we get here the user changed their answer. However we don't want
             // to deduct the wager again, so there's no currency adjustment.
-            logger('debug', `handleAnswer: User ${username} changed their answer to ${answerLabels[answerIndex]}. Previous answer was ${answerLabels[entry.answerIndex]}. Original wager was ${wager}.`);
+            logger('debug', `handleAnswer: User ${username} changed their answer to ${answerLabels[answerIndex]}. Previous answer was ${answerLabels[entry?.answerIndex ?? 0]}. Original wager was ${wager}.`);
         } else {
             // Check if the user has enough currency to cover an incorrect
             // answer. Adjust their wager downward if insufficient balances are
@@ -342,7 +356,7 @@ export class GameManager {
         };
 
         // If the user answered correctly, award them the wager amount plus the time bonus.
-        if (this.gameState.askedQuestion.correctAnswers.includes(answerIndex)) {
+        if (this.gameState.askedQuestion && this.gameState.askedQuestion.correctAnswers.includes(answerIndex)) {
             logger('debug', `handleAnswer: Trivia answer correct: ${username} answered ${answerLabels[answerIndex]}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
 
             const maxBonus = triviaSettings.currencySettings.timeBonus;
@@ -358,7 +372,7 @@ export class GameManager {
             entry.correct = true;
 
             logger('debug', `handleAnswer: Points calculation for ${username}: totalPoints=${totalPoints} wager=${wager}, timeBonusFactor=${timeBonusFactor}, decayFactor=${triviaSettings.currencySettings.timeBonusDecay}, elapsedTime=${elapsedTime}, maxTime=${maxTime}.`);
-        } else {
+        } else if (this.gameState.askedQuestion) {
             logger('debug', `handleAnswer: Answer incorrect: ${username} answered ${answerLabels[answerIndex]}. Correct answer(s): ${this.gameState.askedQuestion.correctAnswers.map(index => answerLabels[index]).join(', ')}.`);
         }
 
@@ -392,6 +406,10 @@ export class GameManager {
         }
 
         // Make sure the user's answer is one of the valid choices.
+        if (!this.gameState.askedQuestion) {
+            logger('debug', `validateAnswer: No question is currently asked.`);
+            return -1;
+        }
         const numberOfAnswers = this.gameState.askedQuestion.answers.length;
         const answerIndex = answerLabels.indexOf(answer.toUpperCase());
         if (answerIndex < 0 || answerIndex >= numberOfAnswers) {
@@ -462,18 +480,6 @@ export class GameManager {
      * Initialize the game state to starting values
      */
     private initGameState(): void {
-        this.gameState = {
-            askedQuestion: undefined,
-            inProgress: false,
-            complete: false,
-            losers: [],
-            winners: [],
-            questionStart: 0,
-            totalLost: 0,
-            totalAwarded: 0,
-            totalPlayers: 0,
-            totalCorrect: 0,
-            totalIncorrect: 0
-        };
+        this.gameState = emptyGameState;
     }
 }

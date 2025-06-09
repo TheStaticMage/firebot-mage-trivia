@@ -52,7 +52,8 @@ export class FirebotManager {
         const gameSettings = this.getGameSettings();
         const { currencyId } = gameSettings.currencySettings;
 
-        return currencyDb.getCurrencyById(currencyId).name;
+        const currency = currencyDb.getCurrencyById(currencyId);
+        return currency ? currency.name : 'currency';
     }
 
     public getGameSettings(): GameSettings {

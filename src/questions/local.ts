@@ -69,7 +69,7 @@ export class LocalQuestionManager extends QuestionManager {
             let questionKeys = this.questionDB.keys();
             logger('debug', `There are ${questionKeys.length} questions in the database.`);
 
-            if (questionKeys.length === 0 && this.initializeQuestions()) {
+            if (questionKeys.length === 0 && await this.initializeQuestions()) {
                 questionKeys = this.questionDB.keys();
                 logger('warn', `Reloaded questions from file; there are now ${questionKeys.length} questions in the database.`);
             }

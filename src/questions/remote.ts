@@ -1,4 +1,5 @@
 import { logger } from '../firebot';
+import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
 import { Question, QuestionManager } from './common';
 
@@ -16,6 +17,11 @@ type opentdbResponse = {
 
 export class RemoteQuestionManager extends QuestionManager {
     private sessionToken: string;
+
+    constructor(triviaGame: TriviaGame) {
+        super(triviaGame);
+        this.sessionToken = '';
+    }
 
     /**
      * Initialize function entrypoint to be overridden by subclasses.
@@ -141,7 +147,9 @@ export class RemoteQuestionManager extends QuestionManager {
     private fetchUrl(url: string): Promise<any> {
         return new Promise((resolve, reject) => {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+            }, 5000);
 
             fetch(url, { signal: controller.signal })
                 .then((response) => {
@@ -152,7 +160,9 @@ export class RemoteQuestionManager extends QuestionManager {
                         return response.json();
                     }
                 })
-                .then(data => resolve(data))
+                .then((data) => {
+                    resolve(data);
+                })
                 .catch((error) => {
                     if (error.name === 'AbortError') {
                         reject(new Error('Request timed out'));

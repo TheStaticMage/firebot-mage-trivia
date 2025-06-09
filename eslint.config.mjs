@@ -6,7 +6,7 @@ import stylistic from '@stylistic/eslint-plugin';
 
 export default tseslint.config(
   eslint.configs.recommended,
-  tseslint.configs.recommended,
+  tseslint.configs.strictTypeChecked,
   tseslint.configs.stylistic,
     {
         files: ['**/*.ts', '**/*.tsx'],
@@ -20,6 +20,20 @@ export default tseslint.config(
         },
         rules: {
             '@stylistic/indent': ['warn', 4],
+            '@typescript-eslint/restrict-template-expressions': 'off',
+
+            '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
+            '@typescript-eslint/no-unnecessary-condition': 'off',
+            '@typescript-eslint/require-await': 'off',
+            '@typescript-eslint/no-floating-promises': 'off',
+            '@typescript-eslint/no-misused-promises': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unsafe-member-access': 'off',
+            '@typescript-eslint/no-unsafe-call': 'off',
+            '@typescript-eslint/no-unsafe-return': 'off',
+            '@typescript-eslint/no-unsafe-argument': 'off',
+            '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
+            '@typescript-eslint/prefer-promise-reject-errors': 'off',
 
             'no-unused-vars': 'off',
             '@typescript-eslint/no-unused-vars': 'off',

@@ -16,7 +16,7 @@ const usedQuestionsPath = 'firebot-mage-trivia-data/used-questions.json';
 export class TriviaGame {
     private gameManager: GameManager;
     private firebotManager: FirebotManager;
-    private questionManager: QuestionManager;
+    private questionManager!: QuestionManager;
     private triviaGameEvents: TriviaGameEvents;
 
     constructor(firebotManager: FirebotManager) {
