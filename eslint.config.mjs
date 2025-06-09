@@ -24,8 +24,10 @@ export default tseslint.config(
             '@typescript-eslint/ban-ts-comment': 'warn',
             '@typescript-eslint/consistent-generic-constructors': 'warn',
             '@typescript-eslint/no-empty-function': 'warn',
+            '@typescript-eslint/no-this-alias': 'warn',
             '@typescript-eslint/no-unused-vars': 'warn',
             '@typescript-eslint/restrict-template-expressions': 'off',
+            'indent': 'off', // Superseded by TS
             'no-console': 'warn',
             'no-unused-vars': 'off', // Superseded by TS
             'no-use-before-define': 'off',
@@ -78,7 +80,7 @@ export default tseslint.config(
             "comma-style": "warn", // See: https://eslint.org/docs/rules/comma-style
             "computed-property-spacing": "warn", // No whitespace when using object[thing]
             curly: "warn", // Must wrap blocks with {}
-            indent: "off", // Superseded by TS
+
             "key-spacing": ["warn", { mode: "strict" }], // Exactly one space after object key colons
             "keyword-spacing": "warn", // Spaces around keywords
             "linebreak-style": "warn", // Line breaks must be \n
@@ -110,7 +112,7 @@ export default tseslint.config(
             // typescript
             "@typescript-eslint/no-var-requires": "off",
 
-            "@typescript-eslint/no-this-alias": "off",
+
 
             "@typescript-eslint/no-require-imports": "off",
             "no-undef": "off", // Superseded by TS

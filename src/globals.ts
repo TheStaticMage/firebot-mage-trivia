@@ -20,6 +20,7 @@ export class TriviaGame {
     private triviaGameEvents: TriviaGameEvents;
 
     constructor(firebotManager: FirebotManager) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         triviaGame = this;
         this.firebotManager = firebotManager;
         this.gameManager = new GameManager(this);
