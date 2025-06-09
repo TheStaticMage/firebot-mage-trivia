@@ -21,6 +21,10 @@ export default tseslint.config(
         rules: {
             '@stylistic/indent': ['warn', 4],
             '@typescript-eslint/restrict-template-expressions': 'off',
+            "no-console": 'warn',
+            "no-use-before-define": "off",
+            "no-warning-comments": "off",
+            "@typescript-eslint/no-empty-function": "warn",
 
             '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
             '@typescript-eslint/no-unnecessary-condition': 'off',
@@ -38,9 +42,6 @@ export default tseslint.config(
             'no-unused-vars': 'off',
             '@typescript-eslint/no-unused-vars': 'off',
             '@typescript-eslint/no-explicit-any': 'off',
-            // Deviations from https://eslint.org/docs/rules/#possible-errors
-            "no-console": 0, // Enable the use of console
-
             // Deviations from < https://eslint.org/docs/rules/#best-practices >
             eqeqeq: ["warn", "smart"], // No coersion unless comparing against null
             "guard-for-in": "warn", // require an if statement with for-in loops
@@ -57,10 +58,9 @@ export default tseslint.config(
             "no-prototype-builtins": "off",
 
             // Deviation from < https://eslint.org/docs/rules/#strict-mode >
-            strict: "off", // disabled b/c typescript
+            strict: "warn", // disabled b/c typescript
 
             // Deviation from < https://eslint.org/docs/rules/#variables >
-            "no-use-before-define": "off", // require vars to be defined before use
 
             "prefer-const": "warn",
 
@@ -102,11 +102,11 @@ export default tseslint.config(
             "no-empty": ["error", { allowEmptyCatch: true }],
             "no-debugger": "warn",
             "no-extra-boolean-cast": "off",
-            "no-warning-comments": "off",
+
 
             // typescript
             "@typescript-eslint/no-var-requires": "off",
-            "@typescript-eslint/no-empty-function": "off",
+
             "@typescript-eslint/no-this-alias": "off",
             "@typescript-eslint/ban-ts-comment": "off",
             "@typescript-eslint/no-require-imports": "off",
