@@ -20,15 +20,16 @@ export default tseslint.config(
         },
         rules: {
             '@stylistic/indent': ['warn', 4],
+            '@typescript-eslint/array-type': 'warn',
+            '@typescript-eslint/ban-ts-comment': 'warn',
+            '@typescript-eslint/consistent-generic-constructors': 'warn',
+            '@typescript-eslint/no-empty-function': 'warn',
             '@typescript-eslint/no-unused-vars': 'warn',
             '@typescript-eslint/restrict-template-expressions': 'off',
-            "@typescript-eslint/ban-ts-comment": "warn",
-            "@typescript-eslint/consistent-generic-constructors": 'warn',
-            "@typescript-eslint/no-empty-function": "warn",
-            "no-console": 'warn',
+            'no-console': 'warn',
             'no-unused-vars': 'off', // Superseded by TS
-            "no-use-before-define": "off",
-            "no-warning-comments": "off",
+            'no-use-before-define': 'off',
+            'no-warning-comments': 'off',
 
             '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
             '@typescript-eslint/no-unnecessary-condition': 'off',
@@ -115,7 +116,7 @@ export default tseslint.config(
             "no-undef": "off", // Superseded by TS
             "@typescript-eslint/consistent-type-definitions": 'off',
 
-            "@typescript-eslint/array-type": "off"
+
         },
     }
 );
