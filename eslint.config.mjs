@@ -20,11 +20,15 @@ export default tseslint.config(
         },
         rules: {
             '@stylistic/indent': ['warn', 4],
+            '@typescript-eslint/no-unused-vars': 'warn',
             '@typescript-eslint/restrict-template-expressions': 'off',
+            "@typescript-eslint/ban-ts-comment": "warn",
+            "@typescript-eslint/consistent-generic-constructors": 'warn',
+            "@typescript-eslint/no-empty-function": "warn",
             "no-console": 'warn',
+            'no-unused-vars': 'off', // Superseded by TS
             "no-use-before-define": "off",
             "no-warning-comments": "off",
-            "@typescript-eslint/no-empty-function": "warn",
 
             '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
             '@typescript-eslint/no-unnecessary-condition': 'off',
@@ -39,8 +43,6 @@ export default tseslint.config(
             '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
             '@typescript-eslint/prefer-promise-reject-errors': 'off',
 
-            'no-unused-vars': 'off',
-            '@typescript-eslint/no-unused-vars': 'off',
             '@typescript-eslint/no-explicit-any': 'off',
             // Deviations from < https://eslint.org/docs/rules/#best-practices >
             eqeqeq: ["warn", "smart"], // No coersion unless comparing against null
@@ -108,11 +110,11 @@ export default tseslint.config(
             "@typescript-eslint/no-var-requires": "off",
 
             "@typescript-eslint/no-this-alias": "off",
-            "@typescript-eslint/ban-ts-comment": "off",
+
             "@typescript-eslint/no-require-imports": "off",
             "no-undef": "off", // Superseded by TS
             "@typescript-eslint/consistent-type-definitions": 'off',
-            "@typescript-eslint/consistent-generic-constructors": 'off',
+
             "@typescript-eslint/array-type": "off"
         },
     }

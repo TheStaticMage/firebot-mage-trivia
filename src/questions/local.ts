@@ -137,7 +137,7 @@ export class LocalQuestionManager extends QuestionManager {
         }
 
         const file: string = path.basename(filePath, path.extname(filePath));
-        const questionMap: Map<string, Question> = new Map();
+        const questionMap = new Map<string, Question>();
 
         questions.forEach((question) => {
             const formattedQuestion: Question = {
