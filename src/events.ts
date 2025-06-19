@@ -6,6 +6,8 @@ export const TRIVIA_EVENT_SOURCE_NAME = "Mage Trivia Events";
 
 export enum TriviaEvent {
     ANSWER_ACCEPTED = "triviaAnswerAccepted",
+    ANSWER_CORRECT = "triviaAnswerCorrect",
+    ANSWER_INCORRECT = "triviaAnswerIncorrect",
     ANSWER_REJECTED = "triviaAnswerRejected",
     ERROR_CRITICAL = "triviaErrorCritical",
     ERROR_RUNTIME = "triviaErrorRuntime",
@@ -43,6 +45,13 @@ export type AnswerRejectedMetadata = {
     reasonMessage: string;
 }
 
+export type AnswerCorrectIncorrectMetadata = {
+    username: string;
+    answer: string;
+    answerIndex: number;
+    amount: number; // The amount of points won or lost
+}
+
 /**
  * Metadata for a critical error or runtime error (TRIVIA_ERROR_CRITICAL_EVENT or TRIVIA_ERROR_RUNTIME_EVENT)
  */
@@ -75,6 +84,28 @@ const eventSource: EventSource = {
             id: TriviaEvent.ANSWER_ACCEPTED,
             name: "Answer Accepted Timer Fired",
             description: "Fires on a periodic basis while a game is in progress to acknowledge accepted answers."
+        },
+        {
+            id: TriviaEvent.ANSWER_CORRECT,
+            name: "Answer Correct",
+            description: "Fires when the trivia game ends and a user answered the question correctly.",
+            manualMetadata: {
+                username: "firebot",
+                answer: "A",
+                answerIndex: 0,
+                amount: 100
+            }
+        },
+        {
+            id: TriviaEvent.ANSWER_INCORRECT,
+            name: "Answer Incorrect",
+            description: "Fires when the trivia game ends and a user answered the question incorrectly.",
+            manualMetadata: {
+                username: "firebot",
+                answer: "B",
+                answerIndex: 1,
+                amount: 50
+            }
         },
         {
             id: TriviaEvent.ANSWER_REJECTED,
