@@ -7,11 +7,11 @@ import { GameManager } from './game';
 import { getQuestionManager, QuestionManager } from './questions/common';
 import { registerReplaceVariables } from './variables';
 
-declare const SCRIPTS_DIR: string;
-
 export let triviaGame: TriviaGame;
 
-const usedQuestionsPath = 'firebot-mage-trivia-data/used-questions.json';
+const usedQuestionsFile = 'used-questions.json';
+const usedQuestionsPath = `script-data/firebot-mage-trivia/${usedQuestionsFile}`; // Old path for compatibility
+declare const SCRIPTS_DIR: string; // Old method for compatibility
 
 export class TriviaGame {
     private gameManager: GameManager;
@@ -40,16 +40,16 @@ export class TriviaGame {
         try {
             // Requires a version of Firebot that exposes the profile manager.
             // See https://github.com/crowbartools/Firebot/issues/3180
-            const { profileManager } = this.getFirebotManager().getModules();
-            const result = profileManager.getPathInProfile(usedQuestionsPath);
-            logger('debug', `Got used question persistence path from profile manager: ${result}`);
+            const { path, scriptDataDir } = this.getFirebotManager().getModules();
+            const result = path.join(scriptDataDir, usedQuestionsFile);
+            logger('debug', `Got used question persistence path from scriptDataDir: ${scriptDataDir}`);
             return result;
         } catch (error) {
-            // Fall back to the alternate method if the above fails
+            // Fall back to the legacy method, compatible with older versions of Firebot.
             const profileDirectory = path.join(SCRIPTS_DIR, '..');
             const usedQuestionsPathSplit = usedQuestionsPath.split('/');
             const result = path.join(profileDirectory, ...usedQuestionsPathSplit);
-            logger('debug', `Got used question persistence path from alternate method: ${result} (error: ${error})`);
+            logger('debug', `Got used question persistence path from legacy method: ${result} (error: ${error})`);
             return result;
         }
     }

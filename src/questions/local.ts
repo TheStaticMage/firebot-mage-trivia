@@ -3,7 +3,6 @@ import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as NodeCache from 'node-cache';
-import * as path from 'path';
 import { logger } from '../firebot';
 import { TriviaGame } from '../globals';
 import { ErrorType, reportError } from '../util/errors';
@@ -136,6 +135,7 @@ export class LocalQuestionManager extends QuestionManager {
             return;
         }
 
+        const { path } = this.triviaGame.getFirebotManager().getModules();
         const file: string = path.basename(filePath, path.extname(filePath));
         const questionMap = new Map<string, Question>();
 
@@ -222,9 +222,10 @@ export class LocalQuestionManager extends QuestionManager {
 
         await this.fileMutex.runExclusive(async (): Promise<void> => {
             try {
+                const { path } = this.triviaGame.getFirebotManager().getModules();
                 const usedQuestionsFileDir = path.dirname(usedQuestionsFilePath);
                 if (!fs.existsSync(usedQuestionsFileDir)) {
-                    fs.mkdirSync(usedQuestionsFileDir);
+                    fs.mkdirSync(usedQuestionsFileDir, { recursive: true });
                     logger('debug', `Created directory for used questions file: ${usedQuestionsFileDir}`);
                 }
 
