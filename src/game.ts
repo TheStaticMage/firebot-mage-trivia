@@ -1,7 +1,7 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
-import { AnswerAcceptedMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
+import { AnswerAcceptedMetadata, AnswerCorrectIncorrectMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
@@ -263,6 +263,27 @@ export class GameManager {
         this.gameState.inProgress = false;
 
         this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.GAME_ENDED, {}, false);
+
+        // Emit correct and incorrect answer events for each user.
+        this.gameState.winners.forEach((winner) => {
+            const metadata : AnswerCorrectIncorrectMetadata = {
+                username: winner.username,
+                answer: winner.answer === -1 ? "" : answerLabels[winner.answer],
+                answerIndex: winner.answer,
+                amount: winner.points
+            };
+            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_CORRECT, metadata, false);
+        });
+
+        this.gameState.losers.forEach((loser) => {
+            const metadata: AnswerCorrectIncorrectMetadata = {
+                username: loser.username,
+                answer: loser.answer === -1 ? "" : answerLabels[loser.answer],
+                answerIndex: loser.answer,
+                amount: loser.points
+            };
+            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_INCORRECT, metadata, false);
+        });
 
         // Clear everything.
         this.clearTemporaryState();

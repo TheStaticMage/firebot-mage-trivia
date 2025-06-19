@@ -1,6 +1,8 @@
 # Reference: Events
 
 - [Answer Accepted Timer Fired](#answer-accepted-timer-fired)
+- [Answer Correct](#answer-correct)
+- [Answer Incorrect](#answer-incorrect)
 - [Answer Rejected](#answer-rejected)
 - [Critical Error](#critical-error)
 - [Game Cancelled](#game-cancelled)
@@ -42,6 +44,73 @@ Because the event does not fire if nobody has answered the question since the la
 - When setting `$mageTriviaAnswerAccepted`, if the user has been reported in a previous event but then changed their answer since the last event, the user will again be reported in the firing event.
 - When setting `$mageTriviaAnswerAccepted`, users are alphabetized.
 - When setting `$mageTriviaAnswerAccepted`, the user display name (username with preferred capitalization) is used if available.
+
+## Answer Correct
+
+#### Description
+
+This event fires once for each user who answered the question correctly, once the game has ended.
+
+#### Handling this Event
+
+This event might be used to record user-specific information or statistics. For example:
+
+- Updating lifetime trivia statistics in the user's metadata.
+- Updating a counter of total correct trivia answers given in the stream.
+- Registering credit for the closing credits role with the [Mage Credits Generator](https://github.com/TheStaticMage/firebot-mage-credits-generator)
+
+#### Variables
+
+Sets [`$mageTriviaAnswerAmount`](/doc/reference/variables.md#) to the amount of currency the player was awarded.
+
+Sets [`$mageTriviaAnswerIndex`](/doc/reference/variables.md#) to the text of the answer that was given by the player (e.g. 0).
+
+Sets [`$mageTriviaAnswerLetter`](/doc/reference/variables.md#) to the letter of the answer that was given by the player (e.g. A, B, C, or D).
+
+Sets [`$mageTriviaAnswerUsername`](/doc/reference/variables.md#) to the username of the player.
+
+#### Notes & Limitations
+
+- This is an advanced event that most users will not handle. The trivia game will work just fine without it.
+- The [Game Ended](#game-ended) event is the best place to chat out the correct answer and a summary of the winners. To avoid Twitch rate limits, it is not recommended to chat as part of handling this event.
+- This event will always be emitted _after_ the [Game Ended](#game-ended) event.
+- This event will not be emitted if the game is cancelled.
+- Currency is automatically adjusted by the game. You do not need to handle currency adjustments in this event.
+- You can use `$mageTriviaAnswerIndex` in conjunction with [`$mageTriviaAnswers`](/doc/reference/variables.md#magetriviaanswers) to identify the text of the answer that the user provided.
+- Other events have already set [`$mageTriviaCorrectAnswers`](/doc/reference/variables.md#magetriviacorrectanswers) which may be useful.
+
+## Answer Incorrect
+
+#### Description
+
+This event fires once for each user who answered the question incorrectly, once the game has ended.
+
+#### Handling this Event
+
+This event might be used to record user-specific information or statistics. For example:
+
+- Updating lifetime trivia statistics in the user's metadata.
+- Updating a counter of total incorrect trivia answers given in the stream.
+
+#### Variables
+
+Sets [`$mageTriviaAnswerAmount`](/doc/reference/variables.md#) to the amount of currency the player was penalized. (This will be reported as a positive number, but note that it was _subtracted_ from the user's balance.)
+
+Sets [`$mageTriviaAnswerIndex`](/doc/reference/variables.md#) to the text of the answer that was given by the player (e.g. 0).
+
+Sets [`$mageTriviaAnswerLetter`](/doc/reference/variables.md#) to the letter of the answer that was given by the player (e.g. A, B, C, or D).
+
+Sets [`$mageTriviaAnswerUsername`](/doc/reference/variables.md#) to the username of the player.
+
+#### Notes & Limitations
+
+- This is an advanced event that most users will not handle. The trivia game will work just fine without it.
+- The [Game Ended](#game-ended) event is the best place to chat out the correct answer and a summary of the winners. To avoid Twitch rate limits, it is not recommended to chat as part of handling this event.
+- This event will always be emitted _after_ the [Game Ended](#game-ended) event.
+- This event will not be emitted if the game is cancelled.
+- Currency is automatically adjusted by the game. You do not need to handle currency adjustments in this event.
+- You can use `$mageTriviaAnswerIndex` in conjunction with [`$mageTriviaAnswers`](/doc/reference/variables.md#magetriviaanswers) to identify the text of the answer that the user provided.
+- Other events have already set [`$mageTriviaCorrectAnswers`](/doc/reference/variables.md#magetriviacorrectanswers) which may be useful.
 
 ## Answer Rejected
 
