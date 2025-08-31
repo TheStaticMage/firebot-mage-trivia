@@ -1,5 +1,6 @@
 import { EventSource } from '@crowbartools/firebot-custom-scripts-types/types/modules/event-manager';
 import { TriviaGame } from './globals';
+import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 
 export const TRIVIA_EVENT_SOURCE_ID = "magetrivia";
 export const TRIVIA_EVENT_SOURCE_NAME = "Mage Trivia Events";
@@ -50,6 +51,7 @@ export type AnswerCorrectIncorrectMetadata = {
     answer: string;
     answerIndex: number;
     amount: number; // The amount of points won or lost
+    trigger: Effects.Trigger | undefined; // Original trigger data from answer
 }
 
 /**

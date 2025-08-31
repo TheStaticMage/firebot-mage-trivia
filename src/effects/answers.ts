@@ -44,6 +44,8 @@ export const answerEffect: Firebot.EffectType<any> = {
             return;
         }
 
-        await triviaGame.getGameManager().handleAnswer(username, userDisplayName, messageText);
+        // Get the original trigger from the event so we can use it later.
+        const { trigger } = event;
+        await triviaGame.getGameManager().handleAnswer(username, userDisplayName, messageText, trigger);
     }
 };
