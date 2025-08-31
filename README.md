@@ -52,7 +52,7 @@ Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) wh
 
 3. For your convenience, I have created an importable "setup" with some Firebot resources (events, preset effect lists, etc.) to have a minimally functional trivia game.
 
-    - Download the `MageTriviaResources-<version>.firebotsetup` file from the [Release](https://github.com/TheStaticMage/firebot-mage-trivia/releases)
+    - Download the [`MageTriviaResources-<version>.firebotsetup`](/misc/setup/MageTriviaResources.firebotsetup)
     - Import this setup (File &gt; Import Firebot Setup...)
 
 4. Try it out.
