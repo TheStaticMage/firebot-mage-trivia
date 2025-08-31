@@ -5,6 +5,7 @@
 This is a multi-player chat trivia game for [Firebot](https://firebot.app/) (the all-in-one bot for Twitch streamers).
 
 Features:
+
 - Supports two sources of questions:
   - A local file with questions that you curate
   - Open Trivia Database <https://opentdb.com/>
@@ -52,7 +53,7 @@ Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) wh
 
 3. For your convenience, I have created an importable "setup" with some Firebot resources (events, preset effect lists, etc.) to have a minimally functional trivia game.
 
-    - Download the [`MageTriviaResources-<version>.firebotsetup`](/misc/setup/MageTriviaResources.firebotsetup)
+    - Download the [`MageTriviaResources.firebotsetup`](/misc/setup/MageTriviaResources.firebotsetup)
     - Import this setup (File &gt; Import Firebot Setup...)
 
 4. Try it out.
