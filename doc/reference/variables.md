@@ -57,6 +57,12 @@ This is an array of users (with preferred capitalization when possible) who have
 
 This is commonly used to acknowledge answers in chat (see the example). This is implemented due to rate limits in the Twitch API where sending a chat message to acknowledge each user's response would eventually result in errors, and make the chat very noisy.
 
+It is possible one or more `key=value` arguments to this variable to filter results. Accepted filters are:
+
+- `username=<username>`
+- `userDisplayName=<user display name>`
+- `platform=twitch` or `platform=kick` (if you are using the [Kick Integration](https://github.com/TheStaticMage/firebot-mage-kick-integration))
+
 #### Usage & Examples
 
 `$mageTriviaAnswerAccepted => Array`
@@ -71,6 +77,18 @@ This is most commonly used to acknowledge answers in chat when the [Answer Accep
 ```
 Accepted answers for $arrayJoinWith[$mageTriviaAnswerAccepted, "and"]!
 => Accepted answers for TheStaticMage and TheStaticBrock!
+```
+
+Here is an example with the [Kick Integration](https://github.com/TheStaticMage/firebot-mage-kick-integration) to filter by platform:
+
+```
+$mageTriviaAnswerAccepted[platform=twitch]
+```
+
+This example indicates how you can use multiple filters at once. This example is a bit contrived, however, as there are better ways to see of an element is in the array.
+
+```
+$mageTriviaAnswerAccepted[platform=twitch,username=thestaticmage]
 ```
 
 #### Notes & Limitations
