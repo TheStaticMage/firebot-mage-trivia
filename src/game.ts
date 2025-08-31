@@ -1,7 +1,7 @@
 import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
-import { AnswerAcceptedMetadata, AnswerCorrectIncorrectMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
+import { AnswerAcceptedMetadata, AnswerAcceptedMetadataEntry, AnswerCorrectIncorrectMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
 import { logger } from './firebot';
 import { TriviaGame } from './globals';
 import { askedQuestion } from './questions/common';
@@ -408,7 +408,12 @@ export class GameManager {
         this.answerCache.set(username, entry);
 
         // User answer accepted, for notification when the event next fires.
-        this.answersAccepted.set(userDisplayName, true);
+        const answerAcceptedMetadata: AnswerAcceptedMetadataEntry = {
+            username,
+            userDisplayName,
+            trigger
+        };
+        this.answersAccepted.set(username, answerAcceptedMetadata);
 
         // Successfully recorded the answer.
         return true;
@@ -457,12 +462,24 @@ export class GameManager {
         // Find users who have locked in their answers since the last notification
         const usernames = this.answersAccepted.keys();
         if (usernames.length > 0) {
-            logger('debug', `answerAcceptedHandler: Trivia answers accepted for: ${usernames.join(', ')}`);
-            const locked: AnswerAcceptedMetadata = {
-                usernames: usernames.sort()
+            const entries: AnswerAcceptedMetadataEntry[] = usernames.map((username) => {
+                const entry = this.answersAccepted.get<AnswerAcceptedMetadataEntry>(username);
+                if (!entry?.trigger) {
+                    logger('warn', `answerAcceptedHandler: No trigger found for username '${username}' when building AnswerAcceptedMetadataEntry.`);
+                }
+                return {
+                    username,
+                    userDisplayName: entry?.userDisplayName || username,
+                    trigger: entry?.trigger || undefined
+                };
+            });
+
+            const metadata: AnswerAcceptedMetadata = {
+                entries: entries
             };
-            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_ACCEPTED, locked, false);
+            this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_ACCEPTED, metadata, false);
             this.answersAccepted.flushAll();
+            logger('debug', `answerAcceptedHandler: Trivia answers accepted for: ${usernames.join(', ')}`);
         }
 
         // Reschedule the next run for this function

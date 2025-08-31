@@ -30,8 +30,14 @@ export enum AnswerRejectionReason {
 /**
  * Metadata for an answer that was accepted (TRIVIA_ANSWER_ACCEPTED_EVENT)
  */
+export type AnswerAcceptedMetadataEntry = {
+    username: string;
+    userDisplayName: string;
+    trigger: Effects.Trigger | undefined;
+}
+
 export type AnswerAcceptedMetadata = {
-    usernames: string[];
+    entries: AnswerAcceptedMetadataEntry[];
 }
 
 /**
