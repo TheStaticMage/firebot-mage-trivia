@@ -87,10 +87,10 @@ Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) wh
 
 ## Support
 
-The best way to get help is in this project's thread on Discord. Join the [Crowbar Tools Discord](https://discord.gg/crowbartools-372817064034959370) and then visit the [thread for Mage Trivia]() there.
+The best way to get help is in my Discord server. Join the [The Static Discord](https://discord.gg/TmvGn3ywws) and then visit the `#firebot-mage-trivia` channel there.
 
-  - Please do not DM me on Discord.
-  - Please do not ask for help in my chat when I am live on Twitch.
+- Please do not DM me on Discord.
+- Please do not ask for help in my chat when I am live on Twitch.
 
 Bug reports and feature requests are welcome via [GitHub Issues](https://github.com/TheStaticMage/firebot-mage-trivia/issues).
 
@@ -105,6 +105,8 @@ Mage Trivia is released under the [GNU General Public License version 3](/LICENS
 If you use this on your stream, I would appreciate a shout-out. (Appreciated, but not required.)
 
 - <https://www.twitch.tv/thestaticmage>
+- <https://kick.com/thestaticmage>
+- <https://youtube.com/@thestaticmagerisk>
 
 A small amount of code was copied from [Firebot](https://github.com/crowbartools/firebot), which you're presumably already using, and which has the same license.
 

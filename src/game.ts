@@ -16,6 +16,7 @@ type AnswerEntry = {
     answerIndex: number;
     award: number;
     correct: boolean;
+    trigger: Effects.Trigger;
     userDisplayName?: string; // Optional display name for the user
     wager: number; // The amount subtracted for an incorrect answer
 }
@@ -219,10 +220,15 @@ export class GameManager {
 
         // Award points to users who answered correctly and update the final
         // stats in the game state.
+        const userTriggers = new Map<string, Effects.Trigger>();
         const winnerPoints = new Map<string, number>();
         this.answerCache.keys().forEach((user) => {
             const cacheEntry = this.answerCache.get<AnswerEntry>(user);
-            if (cacheEntry?.correct) {
+            if (!cacheEntry) {
+                return;
+            }
+            userTriggers.set(user, cacheEntry.trigger || { type: "manual" });
+            if (cacheEntry.correct) {
                 logger('debug', `User ${user} answered the question correctly. Awarding ${cacheEntry.award} points (includes refunding wager of ${cacheEntry.wager}).`);
                 this.triviaGame.getFirebotManager().adjustCurrencyForUser(cacheEntry.award, user);
                 winnerPoints.set(user, cacheEntry.award - cacheEntry.wager);
@@ -270,7 +276,8 @@ export class GameManager {
                 username: winner.username,
                 answer: winner.answer === -1 ? "" : answerLabels[winner.answer],
                 answerIndex: winner.answer,
-                amount: winner.points
+                amount: winner.points,
+                trigger: userTriggers.get(winner.username)
             };
             this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_CORRECT, metadata, false);
         });
@@ -280,7 +287,8 @@ export class GameManager {
                 username: loser.username,
                 answer: loser.answer === -1 ? "" : answerLabels[loser.answer],
                 answerIndex: loser.answer,
-                amount: loser.points
+                amount: loser.points,
+                trigger: userTriggers.get(loser.username)
             };
             this.triviaGame.getFirebotManager().emitEvent(TRIVIA_EVENT_SOURCE_ID, TriviaEvent.ANSWER_INCORRECT, metadata, false);
         });
@@ -294,7 +302,7 @@ export class GameManager {
     /**
      * Handle a user's answer to a question
      */
-    async handleAnswer(username: string, userDisplayName: string, messageText: string): Promise<boolean> {
+    async handleAnswer(username: string, userDisplayName: string, messageText: string, trigger: Effects.Trigger): Promise<boolean> {
         const answerIndex = this.validateAnswer(messageText);
         if (answerIndex === -1) {
             // We aren't logging this because we could end up effectively
@@ -370,6 +378,7 @@ export class GameManager {
             answerIndex: answerIndex,
             award: 0,
             correct: false,
+            trigger: trigger,
             userDisplayName: userDisplayName,
             wager: wager
         };
