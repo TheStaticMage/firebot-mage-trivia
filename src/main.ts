@@ -4,7 +4,7 @@ import { FirebotManager } from './firebot';
 import { TriviaGame } from './globals';
 import { gameSettings } from './settings';
 
-const scriptVersion = '0.0.2';
+const scriptVersion = '0.0.3';
 
 const script: Firebot.CustomScript<object> = {
     getScriptManifest: () => {
