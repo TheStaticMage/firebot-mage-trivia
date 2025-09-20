@@ -28,8 +28,8 @@ export type GameState = {
     askedQuestion: askedQuestion | undefined; // The asked question object containing the question and answers
     inProgress: boolean; // Indicates if the game is in progress
     complete: boolean; // Indicates if the game is complete
-    losers: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of users who answered incorrectly
-    winners: { username: string; userDisplayName: string, answer: number, points: number }[]; // List of winners with their points
+    losers: { username: string; userDisplayName: string, answer: number, points: number, platform: 'twitch' | 'kick' }[]; // List of users who answered incorrectly
+    winners: { username: string; userDisplayName: string, answer: number, points: number, platform: 'twitch' | 'kick' }[]; // List of winners with their points
     questionStart: number; // Timestamp when the question started
     totalLost: number; // Total amount lost by all users for incorrect answers
     totalAwarded: number; // Total amount awarded to winners
@@ -255,14 +255,26 @@ export class GameManager {
             .filter(user => !this.answerCache.get<AnswerEntry>(user)?.correct)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
-                return { username: username, userDisplayName: entry?.userDisplayName || username, answer: entry?.answerIndex || -1, points: entry?.wager || 0 };
+                return {
+                    username: username,
+                    userDisplayName: entry?.userDisplayName || username.replace(/@kick$/, ''),
+                    answer: entry?.answerIndex || -1,
+                    points: entry?.wager || 0,
+                    platform: username.endsWith('@kick') ? 'kick' : 'twitch'
+                };
             });
 
         this.gameState.winners = Array.from(winnerPoints.keys())
             .filter(user => winnerPoints.get(user) !== undefined)
             .map((username) => {
                 const entry = this.answerCache.get<AnswerEntry>(username);
-                return { username: username, userDisplayName: entry?.userDisplayName || username, answer: entry?.answerIndex || -1, points: winnerPoints.get(username) || 0 };
+                return {
+                    username: username,
+                    userDisplayName: entry?.userDisplayName || username.replace(/@kick$/, ''),
+                    answer: entry?.answerIndex || -1,
+                    points: winnerPoints.get(username) || 0,
+                    platform: username.endsWith('@kick') ? 'kick' : 'twitch'
+                };
             });
 
         this.gameState.complete = true;
