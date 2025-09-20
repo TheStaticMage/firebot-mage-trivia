@@ -2,8 +2,9 @@ import { TriviaGame } from '../globals';
 import { mageTriviaAnswerAmount, mageTriviaAnswerIndex, mageTriviaAnswerLetter, mageTriviaAnswerUsername } from './answer-results';
 import { arrayJoinWith } from './array-join-with';
 import { mageTriviaError, mageTriviaErrorFull } from './errors';
+import { mageTriviaGameResultsRaw, mageTriviaWinners, mageTriviaWinnersWithPoints } from './game-results';
 import { mageTriviaGameInProgress, mageTriviaGameTimeRemaining } from './game-status';
-import { mageTriviaAnswers, mageTriviaCorrectAnswers, mageTriviaGameResultsRaw, mageTriviaPossibleAnswers, mageTriviaQuestion, mageTriviaQuestionAndAnswersRaw, mageTriviaWinners, mageTriviaWinnersWithPoints } from './unorganized';
+import { mageTriviaAnswers, mageTriviaCorrectAnswers, mageTriviaPossibleAnswers, mageTriviaQuestion, mageTriviaQuestionAndAnswersRaw } from './unorganized';
 import { mageTriviaAnswerAccepted, mageTriviaAnswerRejected, mageTriviaAnswerRejectedRaw } from './user-answer';
 
 export function registerReplaceVariables(triviaGame: TriviaGame): void {
