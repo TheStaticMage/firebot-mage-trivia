@@ -16,7 +16,7 @@
     "author": "Firebottle",
     "license": "GNU3",
     "dependencies": {
-        "@crowbartools/firebot-custom-scripts-types": "TheStaticMage/firebot-custom-scripts-types#running",
+        "@crowbartools/firebot-custom-scripts-types": "github:TheStaticMage/firebot-custom-scripts-types#running",
         "async-mutex": "^0.5.0",
         "crypto": "^1.0.1",
         "js-yaml": "^4.1.0",
