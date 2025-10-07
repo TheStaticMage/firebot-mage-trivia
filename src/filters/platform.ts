@@ -1,4 +1,4 @@
-import { Effects } from "@crowbartools/firebot-custom-scripts-types/types/effects";
+import { Trigger } from '@crowbartools/firebot-custom-scripts-types/types/triggers';
 import { EventData, EventFilter, FilterEvent, PresetValue } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager";
 import { TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from "../events";
 import { logger } from "../firebot";
@@ -60,10 +60,10 @@ export const platformFilter: EventFilter = {
 
         const trigger = eventData.eventMeta.trigger;
         if (!trigger || typeof trigger !== "object") {
-            logger('warn', 'Platform filter: trigger is not of type Effects.Trigger');
+            logger('warn', 'Platform filter: trigger is not of type Trigger');
             return true;
         }
-        const originalTrigger: Effects.Trigger = trigger as unknown as Effects.Trigger;
+        const originalTrigger: Trigger = trigger as unknown as Trigger;
         const platform = platformEvaluator(originalTrigger);
         return (comparisonType === "is" && platform === value) ||
                (comparisonType === "is not" && platform !== value);

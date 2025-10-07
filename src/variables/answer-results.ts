@@ -1,4 +1,4 @@
-import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
+import { Trigger } from '@crowbartools/firebot-custom-scripts-types/types/triggers';
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
 import { AnswerCorrectIncorrectMetadata, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
 import { logger } from '../firebot';
@@ -13,7 +13,7 @@ export const mageTriviaAnswerAmount: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_CORRECT}`, `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_INCORRECT}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const eventData = trigger.metadata?.eventData as AnswerCorrectIncorrectMetadata;
         if (!eventData) {
             logger('warn', 'Called mageTriviaAnswerAmount variable without expected metadata.');
@@ -33,7 +33,7 @@ export const mageTriviaAnswerIndex: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_CORRECT}`, `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_INCORRECT}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const eventData = trigger.metadata?.eventData as AnswerCorrectIncorrectMetadata;
         if (!eventData) {
             logger('warn', 'Called mageTriviaAnswerIndex variable without expected metadata.');
@@ -53,7 +53,7 @@ export const mageTriviaAnswerLetter: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_CORRECT}`, `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_INCORRECT}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const eventData = trigger.metadata?.eventData as AnswerCorrectIncorrectMetadata;
         if (!eventData) {
             logger('warn', 'Called mageTriviaAnswerLetter variable without expected metadata.');
@@ -73,7 +73,7 @@ export const mageTriviaAnswerUsername: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_CORRECT}`, `${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_INCORRECT}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const eventData = trigger.metadata?.eventData as AnswerCorrectIncorrectMetadata;
         if (!eventData) {
             logger('warn', 'Called mageTriviaAnswerUsername variable without expected metadata.');

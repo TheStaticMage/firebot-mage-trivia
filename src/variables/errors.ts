@@ -1,4 +1,4 @@
-import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
+import { Trigger } from '@crowbartools/firebot-custom-scripts-types/types/triggers';
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
 import { TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
 import { logger } from '../firebot';
@@ -16,7 +16,7 @@ export const mageTriviaError: ReplaceVariable = {
             ]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const safeMessage = trigger.metadata.eventData?.safeMessage as string;
         if (!safeMessage) {
             logger('warn', `Called mageTriviaError variable without error message. ${JSON.stringify(trigger.metadata)}`);
@@ -42,7 +42,7 @@ export const mageTriviaErrorFull: ReplaceVariable = {
             ]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const safeMessage = trigger.metadata.eventData?.safeMessage as string;
         if (!safeMessage) {
             logger('warn', `Called mageTriviaErrorFull variable without error message. ${JSON.stringify(trigger.metadata)}`);

@@ -1,10 +1,10 @@
-import { Effects } from "@crowbartools/firebot-custom-scripts-types/types/effects";
+import { Trigger } from '@crowbartools/firebot-custom-scripts-types/types/triggers';
 
 // Taken from https://github.com/TheStaticMage/firebot-mage-kick-integration/blob/main/src/variables/platform.ts
 // Would be super cool if we could just have Firebot resolve this
 // internally somehow. If this is possible, please feel free to
 // implement or let me know.
-export function platformEvaluator(trigger: Effects.Trigger): string {
+export function platformEvaluator(trigger: Trigger): string {
     // Manual trigger prefers the event source regardless of metadata
     if (trigger.type === "manual") {
         switch (trigger.metadata.eventSource?.id) {
@@ -31,7 +31,7 @@ export function platformEvaluator(trigger: Effects.Trigger): string {
 
     // If there's a chat message, guess the platform from the user ID or username
     if (trigger.metadata.chatMessage) {
-        const chatMessage = trigger.metadata.chatMessage;
+        const chatMessage = trigger.metadata.chatMessage as { userId?: string; username?: string };
         if (chatMessage.userId && chatMessage.userId.startsWith("k")) {
             return "kick";
         }

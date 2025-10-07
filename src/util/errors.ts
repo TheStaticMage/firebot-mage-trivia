@@ -1,4 +1,4 @@
-import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
+import { Trigger } from '@crowbartools/firebot-custom-scripts-types/types/triggers';
 import { ErrorMetadata, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
 import { logger } from '../firebot';
 import { triviaGame } from '../globals';
@@ -8,7 +8,7 @@ export enum ErrorType {
     RUNTIME_ERROR = 'Runtime Error',
 }
 
-export function reportError(errorType: ErrorType, fullErrorMessage: string, safeErrorMessage: string, trigger?: Effects.Trigger): void {
+export function reportError(errorType: ErrorType, fullErrorMessage: string, safeErrorMessage: string, trigger?: Trigger): void {
     // Full message is not always set.
     const loggedMessage = fullErrorMessage ? `${safeErrorMessage} ${fullErrorMessage}` : safeErrorMessage;
     const metadata: ErrorMetadata = {
