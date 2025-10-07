@@ -25,15 +25,13 @@ Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) wh
 
 ## Installation
 
-1. From the latest [Release](https://github.com/TheStaticMage/firebot-mage-trivia/releases), download `Firebot-MageTrivia-<version>.js` into your Firebot scripts directory (File &gt; Open Data Folder, then select the "scripts" directory).
+:warning: Mage Trivia version 0.1.0 and later require Firebot 5.65 or later. Strongly consider updating Firebot to the latest version. (If you must use Firebot 5.64, install Mage Trivia 0.0.4.)
 
-    :warning: If you are upgrading from a prior version, delete any older versions of this script.
+1. Enable custom scripts in Firebot (Settings &gt; Scripts) if you have not already done so.
 
-2. Enable custom scripts in Firebot (Settings &gt; Scripts).
+2. From the latest [Release](https://github.com/TheStaticMage/firebot-mage-trivia/releases), download `Firebot-MageTrivia-<version>.js` into your Firebot scripts directory (File &gt; Open Data Folder, then select the "scripts" directory).
 
 3. Add the `Firebot-MageTrivia-<version>.js` script that you just added as a startup script (Settings &gt; Scripts &gt; Manage Startup Scripts &gt; Add New Script).
-
-    :warning: If you are upgrading from a prior version, delete any references to the older versions.
 
 4. Restart Firebot.
 
@@ -91,7 +89,7 @@ Feel free to stop by my Twitch stream (<https://www.twitch.tv/thestaticmage>) wh
 The best way to get help is in my Discord server. Join the [The Static Discord](https://discord.gg/TmvGn3ywws) and then visit the `#firebot-mage-trivia` channel there.
 
 - Please do not DM me on Discord.
-- Please do not ask for help in my chat when I am live on Twitch.
+- Please do not ask for help in my chat when I am streaming.
 
 Bug reports and feature requests are welcome via [GitHub Issues](https://github.com/TheStaticMage/firebot-mage-trivia/issues).
 

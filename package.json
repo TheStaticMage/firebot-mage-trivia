@@ -1,7 +1,7 @@
 {
     "name": "firebot-mage-trivia",
     "scriptOutputName": "Firebot-MageTrivia",
-    "version": "0.0.4",
+    "version": "0.1.0",
     "description": "Multiplayer trivia game for Firebot",
     "main": "",
     "scripts": {

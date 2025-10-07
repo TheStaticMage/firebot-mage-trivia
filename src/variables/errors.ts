@@ -2,7 +2,6 @@ import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effect
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
 import { TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
 import { logger } from '../firebot';
-import { triviaGame } from '../globals';
 
 export const mageTriviaError: ReplaceVariable = {
     definition: {
@@ -30,9 +29,11 @@ export const mageTriviaError: ReplaceVariable = {
 
 export const mageTriviaErrorFull: ReplaceVariable = {
     definition: {
-        handle: "mageTriviaErrorFullDONOTUSETHISINCHAT",
+        handle: "mageTriviaErrorFull",
+        aliases: ["mageTriviaErrorFullDONOTUSETHISINCHAT"],
         description: "Returns the full error message if an error occurred in the trivia game. CAUTION: THIS MAY CONTAIN SENSITIVE INFORMATION AND SHOULD NOT BE USED IN CHAT.",
         possibleDataOutput: ["text"],
+        sensitive: true,
         triggers: {
             "manual": true,
             "event": [
@@ -44,24 +45,16 @@ export const mageTriviaErrorFull: ReplaceVariable = {
     evaluator: async (trigger: Effects.Trigger) => {
         const safeMessage = trigger.metadata.eventData?.safeMessage as string;
         if (!safeMessage) {
-            logger('warn', `Called mageTriviaErrorFullDONOTUSETHISINCHAT variable without error message. ${JSON.stringify(trigger.metadata)}`);
+            logger('warn', `Called mageTriviaErrorFull variable without error message. ${JSON.stringify(trigger.metadata)}`);
             return "";
         }
 
-        let fullMessage = trigger.metadata.eventData?.message as string;
+        const fullMessage = trigger.metadata.eventData?.message as string;
         if (!fullMessage || fullMessage === "" || fullMessage === safeMessage) {
             return safeMessage;
         }
 
-        // If the user has not enabled the "Show Full Error Messages" setting,
-        // we should not return the full error message.
-        const triviaSettings = triviaGame.getFirebotManager().getGameSettings();
-        if (!triviaSettings.otherSettings.enableTriviaErrorFull) {
-            logger('warn', `Called mageTriviaErrorFullDONOTUSETHISINCHAT variable but the user has not enabled the "Show Full Error Messages" setting. ${JSON.stringify(trigger.metadata)}`);
-            fullMessage = "(To see the full error, read the documentation or look in the Firebot logs.)";
-        }
-
-        logger('debug', `mageTriviaErrorFullDONOTUSETHISINCHAT: ${safeMessage} ${fullMessage}`);
+        logger('debug', `mageTriviaErrorFull: ${safeMessage} ${fullMessage}`);
         return `${safeMessage} ${fullMessage}`;
     }
 };

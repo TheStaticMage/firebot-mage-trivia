@@ -203,15 +203,3 @@ When checked, the "used question cache" is written to a file to preserve the sta
 This setting only applies for Trivia Source = File.
 
 This setting controls what happens when all of the questions in the question file have been asked. When checked, the "used question cache" will reset, making all of the questions eligible to be asked again. If this option is unchecked, an error will be logged when the program has run out of questions, and it will not be possible to ask a new question. Most people will want to leave this checked to ensure smooth operation of the program.
-
-### Enable the $mageTriviaErrorFullDONOTUSETHISINCHAT variable
-
-This variable is explained in greater detail:
-
-- [Critical Error event](/doc/reference/events.md#critical-error)
-- [Runtime Error event](/doc/reference/events.md#runtime-error)
-- [`$mageTriviaErrorFullDONOTUSETHISINCHAT` variable](/doc/reference/variables.md#magetriviaerrorfull_do_not_use_this_in_chat)
-
-This variable may contain full error messages from the operating system. This is super helpful information for you to have when fixing any problem. However, these messages might contain sensitive information, like directory or file names, which might have your actual name in them. It is therefore extremely unsafe to post this variable in chat (or use it in any other way where a viewer of your stream might see it).
-
-We force you to check this box as an extra precaution to make sure you understand the implications -- as if the variable name itself wasn't enough...

@@ -204,23 +204,21 @@ This variable is only available for the _Critial Error_ and _Runtime Error_ even
 
 Although we do not recommend posting these error messages in chat, this variable will contain only pre-determined messages that will not leak information such as file paths that could dox the streamer.
 
-## `$mageTriviaErrorFullDONOTUSETHISINCHAT`
+## `$mageTriviaErrorFull`
 
 #### Description
 
 This is a string with the error message from the [Critical Error](/doc/reference/events.md#critical-error) or [Runtime Error](/doc/reference/events.md#runtime-error) event.
 
-If enabled in [advanced settings](/doc/reference/settings.md#enable-the-magetriviaerrorfull_do_not_use_this_in_chat-variable), it will include more details about the error, including the exact error from the operating system. (If you have not enabled it in the advanced settings, this will be equivalent to [`$mageTriviaError`](#magetriviaerror). This is for your safety.)
-
-:warning: **As the name implies, NEVER use this variable in a message that you are posting to your chat. The error message might include something like a file path, which could include some or all of your name, and therefore "dox" you.**
+:warning: **This variable can contain sensitive information. NEVER use this variable in a message that you are posting to your chat. The error message might include something like a file path, which could include some or all of your name, and therefore "dox" you.**
 
 #### Usage & Examples
 
-```
+```text
 // Only when handling Critical Error or Runtime Error
-$mageTriviaErrorFullDONOTUSETHISINCHAT => String
+$mageTriviaErrorFull => String
 
-$mageTriviaErrorFullDONOTUSETHISINCHAT
+$mageTriviaErrorFull
 => Error reading trivia file: /home/your-real-name-here/trivia.yaml: Error: ENOENT: no such file or directory, open '/home/your-real-name-here/trivia.yaml'
 ```
 

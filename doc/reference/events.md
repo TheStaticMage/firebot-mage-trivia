@@ -161,21 +161,19 @@ Critical error events are fired in these situations:
 You should handle this event in a way that will get the your attention, for example:
 
 - If you use the Firebot dashboard, use a Chat Feed Alert or Activity Feed Alert
-    - Example: `$mageTriviaError: $mageTriviaErrorFullDONOTUSETHISINCHAT`
+    - Example: `$mageTriviaError: $mageTriviaErrorFull`
 - Play a sound that only you can hear
 - As a last resort, you could post to your chat
     - It is safe to post `$mageTriviaError` in chat.
-    - :warning: NEVER post `$mageTriviaErrorFullDONOTUSETHISINCHAT` in chat because it could contain sensitive information.
+    - :warning: NEVER post `$mageTriviaErrorFull` in chat because it could contain sensitive information.
 
 #### Variables
 
 Sets [`$mageTriviaError`](/doc/reference/variables.md#magetriviaerror) to a string with a basic error message.
 
-Sets [`$mageTriviaErrorFullDONOTUSETHISINCHAT`](/doc/reference/variables.md#magetriviaerrorfull_do_not_use_this_in_chat) to a string with a more detailed error message.
+Sets [`$mageTriviaErrorFull`](/doc/reference/variables.md#magetriviaerrorfull) to a string with a more detailed error message.
 
 - This detailed error message sometimes contains the full error from the operating system, which can be very handy for debugging, but which can sometimes contain sensitive information. You should never use this variable in any message posted to your chat.
-
-- This detailed error message must be enabled in [settings](/doc/reference/settings.md#enable-the-magetriviaerrorfull_do_not_use_this_in_chat-variable) (to make absolutely sure you are aware of what it contains).
 
 ## Game Cancelled
 
