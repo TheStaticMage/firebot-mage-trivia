@@ -9,9 +9,10 @@ import { createGameEffect } from './create-game';
  */
 export function registerEffects(triviaGame: TriviaGame): void {
     try {
-        triviaGame.getFirebotManager().registerEffect(answerEffect);
-        triviaGame.getFirebotManager().registerEffect(cancelGameEffect);
-        triviaGame.getFirebotManager().registerEffect(createGameEffect);
+        const effectManager = triviaGame.getFirebotManager().getEffectManager();
+        effectManager.registerEffect(answerEffect);
+        effectManager.registerEffect(cancelGameEffect);
+        effectManager.registerEffect(createGameEffect);
         logger('info', "Trivia effects successfully registered");
     } catch (error) {
         logger('error', `Failed to register effects: ${error}`);

@@ -1,4 +1,4 @@
-import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
+import { Trigger } from '@crowbartools/firebot-custom-scripts-types/types/triggers';
 import * as NodeCache from 'node-cache';
 import { answerLabels } from './constants';
 import { AnswerAcceptedMetadata, AnswerAcceptedMetadataEntry, AnswerCorrectIncorrectMetadata, AnswerRejectedMetadata, AnswerRejectionReason, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from './events';
@@ -16,7 +16,7 @@ type AnswerEntry = {
     answerIndex: number;
     award: number;
     correct: boolean;
-    trigger: Effects.Trigger;
+    trigger: Trigger;
     userDisplayName?: string; // Optional display name for the user
     wager: number; // The amount subtracted for an incorrect answer
 }
@@ -114,7 +114,7 @@ export class GameManager {
      * Cancel the current game
      * @param trigger - The effect trigger event
      */
-    async cancelGame(trigger: Effects.Trigger): Promise<void> {
+    async cancelGame(trigger: Trigger): Promise<void> {
         if (!this.isGameInProgress()) {
             reportError(
                 ErrorType.RUNTIME_ERROR,
@@ -146,7 +146,7 @@ export class GameManager {
     /**
      * Create a new trivia game
      */
-    async createGame(trigger: Effects.Trigger): Promise<void> {
+    async createGame(trigger: Trigger): Promise<void> {
         const triviaSettings = this.triviaGame.getFirebotManager().getGameSettings();
 
         // Make sure there isn't a game in progress already.
@@ -220,7 +220,7 @@ export class GameManager {
 
         // Award points to users who answered correctly and update the final
         // stats in the game state.
-        const userTriggers = new Map<string, Effects.Trigger>();
+        const userTriggers = new Map<string, Trigger>();
         const winnerPoints = new Map<string, number>();
         this.answerCache.keys().forEach((user) => {
             const cacheEntry = this.answerCache.get<AnswerEntry>(user);
@@ -314,7 +314,7 @@ export class GameManager {
     /**
      * Handle a user's answer to a question
      */
-    async handleAnswer(username: string, userDisplayName: string, messageText: string, trigger: Effects.Trigger): Promise<boolean> {
+    async handleAnswer(username: string, userDisplayName: string, messageText: string, trigger: Trigger): Promise<boolean> {
         const answerIndex = this.validateAnswer(messageText);
         if (answerIndex === -1) {
             // We aren't logging this because we could end up effectively

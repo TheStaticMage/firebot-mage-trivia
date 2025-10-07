@@ -1,4 +1,4 @@
-import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
+import { Trigger } from '@crowbartools/firebot-custom-scripts-types/types/triggers';
 import { ReplaceVariable } from '@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager';
 import { AnswerAcceptedMetadata, AnswerRejectedMetadata, TRIVIA_EVENT_SOURCE_ID, TriviaEvent } from '../events';
 import { logger } from '../firebot';
@@ -14,7 +14,7 @@ export const mageTriviaAnswerAccepted: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_ACCEPTED}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger, ...args: any[]) => {
+    evaluator: async (trigger: Trigger, ...args: any[]) => {
         const metadata = trigger.metadata.eventData as unknown as AnswerAcceptedMetadata;
         if (!metadata || !Array.isArray(metadata.entries)) {
             logger('warn', `Called mageTriviaAnswerAccepted variable without metadata.entries: ${JSON.stringify(trigger.metadata)}`);
@@ -72,7 +72,7 @@ export const mageTriviaAnswerRejected: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_REJECTED}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const metadata = trigger.metadata as AnswerRejectedMetadata;
         if (!metadata) {
             logger('warn', 'Called mageTriviaAnswerRejected variable without metadata.');
@@ -93,7 +93,7 @@ export const mageTriviaAnswerRejectedRaw: ReplaceVariable = {
             "event": [`${TRIVIA_EVENT_SOURCE_ID}:${TriviaEvent.ANSWER_REJECTED}`]
         }
     },
-    evaluator: async (trigger: Effects.Trigger) => {
+    evaluator: async (trigger: Trigger) => {
         const metadata = trigger.metadata as AnswerRejectedMetadata;
         if (!metadata) {
             logger('warn', 'Called mageTriviaAnswerRejectedRaw variable without metadata.');

@@ -1,6 +1,6 @@
 import { RunRequest, ScriptModules } from '@crowbartools/firebot-custom-scripts-types';
-import { Effects } from '@crowbartools/firebot-custom-scripts-types/types/effects';
 import { ConditionType } from '@crowbartools/firebot-custom-scripts-types/types/modules/condition-manager';
+import { EffectManager } from '@crowbartools/firebot-custom-scripts-types/types/modules/effect-manager';
 import { EventFilter } from '@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager';
 import { EventSource } from '@crowbartools/firebot-custom-scripts-types/types/modules/event-manager';
 import { FirebotGame } from '@crowbartools/firebot-custom-scripts-types/types/modules/game-manager';
@@ -100,9 +100,9 @@ export class FirebotManager {
         conditionManager.registerConditionType(conditionType);
     }
 
-    public registerEffect(effect: Effects.EffectType<object>): void {
+    public getEffectManager(): EffectManager {
         const { effectManager } = this.firebot.modules;
-        effectManager.registerEffect(effect);
+        return effectManager;
     }
 
     public registerEventSource(eventSource: EventSource): void {
