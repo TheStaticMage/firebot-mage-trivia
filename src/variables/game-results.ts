@@ -44,7 +44,12 @@ export const mageTriviaWinners: ReplaceVariable = {
         ],
         possibleDataOutput: ["array"]
     },
-    evaluator: async (trigger, platform = "twitch") => {
+    evaluator: async (trigger, platform = "all") => {
+        // Handle case where platform is undefined, null, or empty string
+        if (!platform || platform.trim() === "") {
+            platform = "all";
+        }
+
         const lastGameResults = triviaGame.getGameManager().getGameState();
         if (!lastGameResults) {
             logger('warn', 'Called mageTriviaWinners variable when no last game results were available.');
@@ -87,7 +92,12 @@ export const mageTriviaWinnersWithPoints: ReplaceVariable = {
         ],
         possibleDataOutput: ["array"]
     },
-    evaluator: async (trigger, platform) => {
+    evaluator: async (trigger, platform = "all") => {
+        // Handle case where platform is undefined, null, or empty string
+        if (!platform || platform.trim() === "") {
+            platform = "all";
+        }
+
         const lastGameResults = triviaGame.getGameManager().getGameState();
         if (!lastGameResults) {
             logger('warn', 'Called mageTriviaLastGameWinnersWithPoints variable when no last game results were available.');
