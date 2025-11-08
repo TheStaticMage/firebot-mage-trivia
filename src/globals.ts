@@ -2,7 +2,7 @@ import { registerConditions } from './conditions';
 import { registerEffects } from './effects';
 import { TriviaGameEvents } from './events';
 import { registerEventFilters } from './filters';
-import { FirebotManager, logger } from './firebot';
+import { FirebotManager } from './firebot';
 import { GameManager } from './game';
 import { getQuestionManager, QuestionManager } from './questions/common';
 import { registerReplaceVariables } from './variables';
@@ -10,8 +10,6 @@ import { registerReplaceVariables } from './variables';
 export let triviaGame: TriviaGame;
 
 const usedQuestionsFile = 'used-questions.json';
-const usedQuestionsPath = `script-data/firebot-mage-trivia/${usedQuestionsFile}`; // Old path for compatibility
-declare const SCRIPTS_DIR: string; // Old method for compatibility
 
 export class TriviaGame {
     private gameManager: GameManager;
@@ -37,21 +35,7 @@ export class TriviaGame {
 
     public getUsedQuestionCachePath(): string {
         const path = this.getFirebotManager().getModules().path;
-        try {
-            // Requires a version of Firebot that exposes the profile manager.
-            // See https://github.com/crowbartools/Firebot/issues/3180
-            const { path, scriptDataDir } = this.getFirebotManager().getModules();
-            const result = path.join(scriptDataDir, usedQuestionsFile);
-            logger('debug', `Got used question persistence path from scriptDataDir: ${scriptDataDir}`);
-            return result;
-        } catch (error) {
-            // Fall back to the legacy method, compatible with older versions of Firebot.
-            const profileDirectory = path.join(SCRIPTS_DIR, '..');
-            const usedQuestionsPathSplit = usedQuestionsPath.split('/');
-            const result = path.join(profileDirectory, ...usedQuestionsPathSplit);
-            logger('debug', `Got used question persistence path from legacy method: ${result} (error: ${error})`);
-            return result;
-        }
+        return path.join(this.getFirebotManager().getScriptDataDir(), usedQuestionsFile);
     }
 
     public getQuestionManager(): QuestionManager {

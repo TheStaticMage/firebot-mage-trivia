@@ -138,6 +138,10 @@ export class FirebotManager {
     public getModules(): ScriptModules {
         return this.firebot.modules;
     }
+
+    public getScriptDataDir(): string {
+        return this.firebot.scriptDataDir;
+    }
 }
 
 export function logger(type: string, message: string): void {
