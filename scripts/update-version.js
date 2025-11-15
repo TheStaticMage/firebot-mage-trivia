@@ -1,5 +1,3 @@
-/* eslint-disable global-require */
-/* eslint-disable import/no-dynamic-require */
 /**
  *  Copies the built script .js to Firebot's scripts folder
  */

@@ -1,5 +1,3 @@
-/* eslint-disable global-require */
-/* eslint-disable import/no-dynamic-require */
 /**
  *  Copies the built script .js to Firebot's scripts folder
  */
@@ -63,7 +61,6 @@ const main = async () => {
 
     await fs.copyFile(srcScriptFilePath, destScriptFilePath);
 
-    // eslint-disable-next-line no-console
     console.log(`Successfully copied ${scriptName} to Firebot scripts folder.`);
 };
 

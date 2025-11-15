@@ -3,13 +3,16 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
+import globals from 'globals';
 
 export default tseslint.config(
   eslint.configs.recommended,
-  tseslint.configs.strictTypeChecked,
-  tseslint.configs.stylistic,
     {
         files: ['**/*.ts', '**/*.tsx'],
+        extends: [
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.stylistic,
+        ],
         languageOptions: {
             parserOptions: {
                 projectService: true,
@@ -99,5 +102,13 @@ export default tseslint.config(
             '@typescript-eslint/require-await': 'off',
             '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
         }
+    },
+    {
+        files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+            },
+        },
     }
 );
