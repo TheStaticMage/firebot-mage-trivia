@@ -28,8 +28,8 @@ export type GameState = {
     askedQuestion: askedQuestion | undefined; // The asked question object containing the question and answers
     inProgress: boolean; // Indicates if the game is in progress
     complete: boolean; // Indicates if the game is complete
-    losers: { username: string; userDisplayName: string, answer: number, points: number, platform: 'twitch' | 'kick' }[]; // List of users who answered incorrectly
-    winners: { username: string; userDisplayName: string, answer: number, points: number, platform: 'twitch' | 'kick' }[]; // List of winners with their points
+    losers: { username: string; userDisplayName: string, answer: number, points: number, platform: 'twitch' | 'kick' | 'youtube' }[]; // List of users who answered incorrectly
+    winners: { username: string; userDisplayName: string, answer: number, points: number, platform: 'twitch' | 'kick' | 'youtube' }[]; // List of winners with their points
     questionStart: number; // Timestamp when the question started
     totalLost: number; // Total amount lost by all users for incorrect answers
     totalAwarded: number; // Total amount awarded to winners
@@ -51,6 +51,19 @@ const emptyGameState: GameState = {
     totalCorrect: 0,
     totalIncorrect: 0
 };
+
+/**
+ * Extract platform from username suffix
+ */
+function getPlatformFromUsername(username: string): 'twitch' | 'kick' | 'youtube' {
+    if (username.endsWith('@kick')) {
+        return 'kick';
+    }
+    if (username.endsWith('@youtube')) {
+        return 'youtube';
+    }
+    return 'twitch';
+}
 
 /**
  * Manages the state and operations for trivia games
@@ -257,10 +270,10 @@ export class GameManager {
                 const entry = this.answerCache.get<AnswerEntry>(username);
                 return {
                     username: username,
-                    userDisplayName: entry?.userDisplayName || username.replace(/@kick$/, ''),
+                    userDisplayName: entry?.userDisplayName || username.replace(/@(kick|youtube)$/, ''),
                     answer: entry?.answerIndex || -1,
                     points: entry?.wager || 0,
-                    platform: username.endsWith('@kick') ? 'kick' : 'twitch'
+                    platform: getPlatformFromUsername(username)
                 };
             });
 
@@ -270,10 +283,10 @@ export class GameManager {
                 const entry = this.answerCache.get<AnswerEntry>(username);
                 return {
                     username: username,
-                    userDisplayName: entry?.userDisplayName || username.replace(/@kick$/, ''),
+                    userDisplayName: entry?.userDisplayName || username.replace(/@(kick|youtube)$/, ''),
                     answer: entry?.answerIndex || -1,
                     points: winnerPoints.get(username) || 0,
-                    platform: username.endsWith('@kick') ? 'kick' : 'twitch'
+                    platform: getPlatformFromUsername(username)
                 };
             });
 
