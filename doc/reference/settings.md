@@ -8,6 +8,7 @@ The settings for Mage Trivia are accessed through Firebot via Games &gt; Mage Tr
     - [Correct Answer Payout](#correct-answer-payout)
     - [Initial Time Bonus and Time Bonus Decay Factor](#initial-time-bonus-and-time-bonus-decay-factor)
     - [Allow Insufficient Balance](#allow-insufficient-balance)
+    - [Dry Run Mode](#dry-run-mode)
 - [Trivia Data Settings](#trivia-data-settings)
     - [Trivia Source](#trivia-source)
     - [Trivia Source File](#trivia-source-file)
@@ -112,6 +113,18 @@ Notes:
 - If a user is not allowed to play, the [Answer Rejected](/doc/reference/events.md#answer-rejected) event will fire, and the [`$mageTriviaAnswerRejected`](/doc/reference/variables.md#magetriviaanswerrejected) and [`$mageTriviaAnswerRejectedRaw`](/doc/reference/variables.md#magetriviaanswerrejectedraw) variables will be set.
 
 - The user's payout is not affected by whether or not the user had enough currency to cover the Incorrect Answer Penalty. The tradeoff to enabling this setting is that a user can win the same amount as other players even though they had less currency "at risk."
+
+## Dry Run Mode
+
+When enabled, the plugin will not actually adjust user currency. Instead, it will track what adjustments would be made and make them available via the [`$mageTriviaCurrencyAdjustments`](/doc/reference/variables.md#magetriviacurrencyadjustments) replace variable.
+
+This is useful if you want to:
+
+- Review currency adjustments before applying them
+- Apply currency adjustments manually through a different system
+- Test the trivia game without affecting user balances
+
+Note: All game events and other functionality continue to work normally in dry run mode. The only difference is that currency adjustments are not applied to user balances.
 
 ## Trivia Data Settings
 

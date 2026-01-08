@@ -1,6 +1,7 @@
 import { TriviaGame } from '../globals';
 import { mageTriviaAnswerAmount, mageTriviaAnswerIndex, mageTriviaAnswerLetter, mageTriviaAnswerUsername } from './answer-results';
 import { arrayJoinWith } from './array-join-with';
+import { mageTriviaCurrencyAdjustments } from './currency-adjustments';
 import { mageTriviaError, mageTriviaErrorFull } from './errors';
 import { mageTriviaGameResultsRaw, mageTriviaWinners, mageTriviaWinnersWithPoints } from './game-results';
 import { mageTriviaGameInProgress, mageTriviaGameTimeRemaining } from './game-status';
@@ -12,6 +13,7 @@ export function registerReplaceVariables(triviaGame: TriviaGame): void {
     triviaGame.getFirebotManager().registerReplaceVariable(mageTriviaAnswerAccepted);
     triviaGame.getFirebotManager().registerReplaceVariable(mageTriviaAnswerRejected);
     triviaGame.getFirebotManager().registerReplaceVariable(mageTriviaAnswerRejectedRaw);
+    triviaGame.getFirebotManager().registerReplaceVariable(mageTriviaCurrencyAdjustments);
     triviaGame.getFirebotManager().registerReplaceVariable(mageTriviaError);
     triviaGame.getFirebotManager().registerReplaceVariable(mageTriviaErrorFull);
     triviaGame.getFirebotManager().registerReplaceVariable(mageTriviaGameInProgress);

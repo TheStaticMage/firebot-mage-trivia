@@ -6,6 +6,7 @@
 - [`$mageTriviaAnswerRejectedRaw`](#magetriviaanswerrejectedraw)
 - [`$mageTriviaAnswers`](#magetriviaanswers)
 - [`$mageTriviaCorrectAnswers`](#magetriviacorrectanswers)
+- [`$mageTriviaCurrencyAdjustments`](#magetriviacurrencyadjustments)
 - [`$mageTriviaError`](#magetriviaerror)
 - [`$mageTriviaGameInProgress`](#magetriviagameinprogress)
 - [`$mageTriviaGameResultsRaw`](#magetriviagameresultsraw)
@@ -181,6 +182,37 @@ $arrayJoinWith[$mageTriviaCorrectAnswers, "or"]
 #### Notes & Limitations
 
 This variable is available without restriction, but it is only populated when a question is started. If this variable is used before a question has been asked in this Firebot session, an empty array (`[]`) is returned.
+
+## `$mageTriviaCurrencyAdjustments`
+
+#### Description
+
+Returns an object containing the currency adjustments for the most recently ended trivia game. The object keys are usernames and the values are the adjustment amounts (positive for awards, negative for deductions).
+
+When dry run mode is enabled, this returns the adjustments that would have been made (but were not applied to user balances). When dry run mode is disabled, this returns the actual adjustments that were applied to user balances.
+
+#### Usage & Examples
+
+```
+$mageTriviaCurrencyAdjustments => Object
+
+$mageTriviaCurrencyAdjustments
+=> { "TheStaticMage": 42, "TheStaticBrock": 30, "Firebot": -4 }
+```
+
+You can access individual adjustments using `$objectWalkPath`:
+
+```
+$objectWalkPath[$mageTriviaCurrencyAdjustments, TheStaticMage]
+=> 42
+
+$objectWalkPath[$mageTriviaCurrencyAdjustments, Firebot]
+=> -4
+```
+
+#### Notes & Limitations
+
+This variable is available without restriction and is populated when a question has ended, regardless of dry run mode setting. If no game has been completed, this variable returns an empty object `{}`.
 
 ## `$mageTriviaError`
 

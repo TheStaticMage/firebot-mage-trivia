@@ -36,6 +36,7 @@ export type GameState = {
     totalPlayers: number; // Total number of players who answered
     totalCorrect: number; // Total number of correct answers
     totalIncorrect: number; // Total number of incorrect answers
+    currencyAdjustments: Record<string, number>; // Map of username to currency adjustment amount (positive for awards, negative for deductions)
 }
 
 const emptyGameState: GameState = {
@@ -49,7 +50,8 @@ const emptyGameState: GameState = {
     totalAwarded: 0,
     totalPlayers: 0,
     totalCorrect: 0,
-    totalIncorrect: 0
+    totalIncorrect: 0,
+    currencyAdjustments: {}
 };
 
 /**
@@ -124,6 +126,25 @@ export class GameManager {
     }
 
     /**
+     * Track a currency adjustment
+     * @param username - The username to adjust currency for
+     * @param amount - The amount to adjust (positive for awards, negative for deductions)
+     */
+    trackCurrencyAdjustment(username: string, amount: number): void {
+        const currentAmount = this.gameState.currencyAdjustments[username] || 0;
+        this.gameState.currencyAdjustments[username] = currentAmount + amount;
+        logger('debug', `trackCurrencyAdjustment: ${username} ${amount >= 0 ? '+' : ''}${amount} (total: ${this.gameState.currencyAdjustments[username]})`);
+    }
+
+    /**
+     * Get the currency adjustments for the current game
+     * @returns A map of usernames to adjustment amounts
+     */
+    getCurrencyAdjustments(): Record<string, number> {
+        return this.gameState.currencyAdjustments;
+    }
+
+    /**
      * Cancel the current game
      * @param trigger - The effect trigger event
      */
@@ -143,6 +164,7 @@ export class GameManager {
             const entry = this.answerCache.get<AnswerEntry>(user);
             if (entry) {
                 logger('debug', `cancelGame: Refunding wager of ${entry.wager} for user ${user}.`);
+                this.trackCurrencyAdjustment(user, entry.wager);
                 this.triviaGame.getFirebotManager().adjustCurrencyForUser(entry.wager, user);
             }
         });
@@ -243,6 +265,7 @@ export class GameManager {
             userTriggers.set(user, cacheEntry.trigger || { type: "manual" });
             if (cacheEntry.correct) {
                 logger('debug', `User ${user} answered the question correctly. Awarding ${cacheEntry.award} points (includes refunding wager of ${cacheEntry.wager}).`);
+                this.trackCurrencyAdjustment(user, cacheEntry.award);
                 this.triviaGame.getFirebotManager().adjustCurrencyForUser(cacheEntry.award, user);
                 winnerPoints.set(user, cacheEntry.award - cacheEntry.wager);
                 this.gameState.totalAwarded += cacheEntry.award - cacheEntry.wager;
@@ -393,6 +416,7 @@ export class GameManager {
             // be re-added at the end of the question if the answer is correct,
             // but we don't want to tip off the user (or others) to correct
             // answers.
+            this.trackCurrencyAdjustment(username, -wager);
             this.triviaGame.getFirebotManager().adjustCurrencyForUser(-wager, username);
             logger('debug', `handleAnswer: User ${username} wagered ${wager} on the question.`);
         }
