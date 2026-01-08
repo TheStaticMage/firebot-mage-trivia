@@ -25,7 +25,12 @@ export class FirebotManager {
     public async adjustCurrencyForUser(amount: number, username: string) {
         const { currencyDb } = this.firebot.modules;
         const gameSettings = this.getGameSettings();
-        const { currencyId } = gameSettings.currencySettings;
+        const { currencyId, dryRunMode } = gameSettings.currencySettings;
+
+        if (dryRunMode) {
+            logger('debug', `adjustCurrencyForUser: Dry run mode enabled, skipping currency adjustment for ${username}: ${amount >= 0 ? '+' : ''}${amount}`);
+            return;
+        }
 
         await currencyDb.adjustCurrencyForUser(
             username,

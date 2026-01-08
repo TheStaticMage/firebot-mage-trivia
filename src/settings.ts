@@ -8,6 +8,7 @@ export type GameSettings = {
         timeBonus: number;
         timeBonusDecay: number;
         allowInsufficientBalance: boolean;
+        dryRunMode: boolean;
     };
     triviaDataSettings: {
         triviaSource: 'File' | 'API';
@@ -106,6 +107,18 @@ export function gameSettings(): Record<string, SettingCategoryDefinition> {
                     tip: "Check the box to let players answer even if they don't have enough currency to cover an incorrect answer.",
                     default: false,
                     sortRank: 6,
+                    showBottomHr: false,
+                    validation: {
+                        required: true
+                    }
+                },
+                dryRunMode: {
+                    type: "boolean",
+                    title: "Dry Run Mode",
+                    description: "When enabled, the plugin will not actually adjust user currency. Instead, it will track what adjustments would be made and make them available via the $mageTriviaCurrencyAdjustments replace variable.",
+                    tip: "Check the box to enable dry run mode. This is useful if you want to review currency adjustments before applying them manually.",
+                    default: false,
+                    sortRank: 7,
                     showBottomHr: false,
                     validation: {
                         required: true
