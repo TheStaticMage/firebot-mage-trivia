@@ -1,5 +1,9 @@
 # Firebot "Mage Trivia" Game
 
+## Deprecation Notice
+
+This plugin is not tested with Firebot 5.67 or later and will no longer be developed. No support or updates will be provided. Code and documentation remain archived here for reference purposes only.
+
 ## Introduction
 
 This is a multi-player chat trivia game for [Firebot](https://firebot.app/) (the all-in-one bot for Twitch streamers).
@@ -43,7 +47,7 @@ See [Installation](/doc/installation.md) for setup instructions and version comp
   - [Filters](/doc/reference/filters.md)
   - [Settings](/doc/reference/settings.md)
   - [Variables](/doc/reference/variables.md)
-
+<!--
 ## Support
 
 The best way to get help is in my Discord server. Join the [The Static Discord](https://discord.gg/TmvGn3ywws) and then visit the `#firebot-mage-trivia` channel there.
@@ -78,3 +82,4 @@ No. Twitch doesn't allow adding or removing of channel points via the API.
 ### Why is this called Mage Trivia?
 
 This game is consistently called "Mage Trivia" to distinguish it from the trivia game that is built in to Firebot. It's named after my Twitch username. Note that you don't (necessarily) have to have your trivia questions pertain to mages, although that _would_ be pretty cool.
+-->
